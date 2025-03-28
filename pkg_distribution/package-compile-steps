@@ -1,0 +1,57 @@
+<---- This command creates .pkg for the script file ----->
+<---First, we create a single executable script which compiles all the files
+<--- in da-vinci-script into a single executable called script with the below command
+
+pyinstaller --onefile --distpath installer-files/da-vinci-script/dist installer-files/da-vinci-script/script.py
+
+<---We also create a file main.py which is a python file wrapper of script detectable by Da Vinci --->
+<--- With these 2 files in /dist, we run the pkg command NOTE: PLACEHOLDER INSTALL LOCATION ---->
+<---  Alternative, when the user presses downloaded, the frontend can retrieve the username on the computer --->
+pkgbuild --root installer-files/da-vinci-script/dist \
+--install-location "/tmp/ai-editor_temp" \
+--identifier com.company_name.script \
+--version 1.0 \
+--ownership recommended \
+--scripts installer-files/da-vinci-script/post_install \
+script.pkg
+
+<---Similarly for the GUI, we use pyinstaller to create a single executable for the <--- GUI in dist directory. That is the only fileput inside gui.pkg-->
+
+pyinstaller --onefile \
+--add-data "$(pwd)/installer-files/User-Interface-Application/src/file.ui:." \
+--hidden-import PyQt6 \
+--hidden-import PyQt6.QtWidgets \
+--hidden-import PyQt6.QtCore \
+--hidden-import PyQt6.QtGui \
+--add-data "$('/Volumes/My Passport for Mac/Coding Projects/AI-Video-Editor-Da-Vinci/ai-env/bin/python3' -c 'import PyQt6; print(PyQt6.__path__[0])')/Qt6/plugins:PyQt6/Qt6/plugins" \
+--distpath installer-files/User-Interface-Application/dist installer-files/User-Interface-Application/src/main_window.py
+
+<---- This command creates the .pkg file for the GUIAPP file ------>
+<-- NOTE: This app will be an entire repository that has to become a standalone file
+<-- for this to work, for now use a test folder ----->
+pkgbuild --root installer-files/User-Interface-Application/dist \
+--install-location "/tmp/ai-gui_temp" \
+--identifier com.company_name.guiapp \
+--version 1.0 \
+--ownership recommended \
+--scripts installer-files/User-Interface-Application/post_install \
+guiapp.pkg
+
+<----- This command createss the .pkg file for the config file ------>
+
+pkgbuild --root installer-files/Support-Files/dist \
+--install-location "/tmp/ai-config" \
+--identifier com.company_name.supportfiles \
+--version 1.0 \
+--ownership recommended \
+--scripts installer-files/Support-Files/post_install \
+support.pkg
+
+<----- This final command combines all 3 above .pkg files into 1 pkg for distribution ---->
+<-- Note that package-path flag gets all .pkg files in the current directory -->
+<-- Resources gets any extra files from the installer_files directory -->
+
+productbuild --distribution pkg_distribution/distribution.xml \
+  --package-path . \
+  --resources ./installer-files \
+  final_installer.pkg

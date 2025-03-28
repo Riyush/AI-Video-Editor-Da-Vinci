@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1.0">
+    <title>My Software Installer</title>
+    <background file="./extras/background.jpeg" mime-type="image/jpeg" alignment="center" scaling="proportional"/>
+    
+    <welcome file="./extras/welcome.txt"/>
+    <license file="./extras/license.txt"/>
+    
+    <choices-outline>
+        <line choice="com.company_name.script"/>
+        <line choice="com.company_name.guiapp"/>
+        <line choice="com.company_name.supportfiles"/>
+    </choices-outline>
+
+    <choice id="com.company_name.script" visible="true" title="Install Script">
+        <pkg-ref id="com.company_name.script"/>
+    </choice>
+
+    <choice id="com.company_name.guiapp" visible="true" title="Install GUI">
+        <pkg-ref id="com.company_name.guiapp"/>
+    </choice>
+
+    <choice id="com.company_name.supportfiles" visible="true" title="Install Support Files">
+        <pkg-ref id="com.company_name.supportfiles"/>
+    </choice>
+
+    <pkg-ref id="com.company_name.script" installKBytes="1024" version="1.0">#script.pkg</pkg-ref>
+    <pkg-ref id="com.company_name.guiapp" installKBytes="20480" version="1.0">#guiapp.pkg</pkg-ref>
+    <pkg-ref id="com.company_name.supportfiles" installKBytes="512" version="1.0">#support.pkg</pkg-ref>
+</installer-gui-script>
