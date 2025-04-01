@@ -1,0 +1,13 @@
+#!/bin/bash
+# Post-install script to move GUI files to user's Application Support
+DEST="$HOME/Library/Application Support/AI-Video-Editor"
+mkdir -p "$DEST"
+
+#Copy files from temp to destination
+cp -R "$3/tmp/ai-config/"* "$DEST/"
+
+# Rewrite config.json with absolute paths
+CONFIG_FILE="$DEST/config.json"
+sed -i '' "s|~|$HOME|g" "$CONFIG_FILE"
+
+rm -rf "$3/tmp/ai-config"

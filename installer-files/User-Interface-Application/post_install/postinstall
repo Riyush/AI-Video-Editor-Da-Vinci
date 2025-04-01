@@ -1,0 +1,6 @@
+#!/bin/bash
+# Post-install script to move GUI files to user's Application Support
+DEST="$HOME/Library/Application Support/AI-Video-Editor"
+mkdir -p "$DEST"
+cp -R "$3/tmp/ai-gui_temp/"* "$DEST/"
+rm -rf "$3/tmp/ai-gui_temp"
