@@ -5,8 +5,8 @@
 pyinstaller --onefile --distpath installer-files/da-vinci-script/dist installer-files/da-vinci-script/script.py
 
 <---We also create a file main.py which is a python file wrapper of script detectable by Da Vinci --->
-<--- With these 2 files in /dist, we run the pkg command NOTE: PLACEHOLDER INSTALL LOCATION ---->
-<---  Alternative, when the user presses downloaded, the frontend can retrieve the username on the computer --->
+<--- With these 2 files in /dist, we run the pkg command This installs at system level /tmp/ai-editor_temp ---->
+<---  When the user downloads, the post-install script puts the script in Fusion/Scripts/Utility/ --->
 pkgbuild --root installer-files/da-vinci-script/dist \
 --install-location "/tmp/ai-editor_temp" \
 --identifier com.company_name.script \
@@ -15,7 +15,8 @@ pkgbuild --root installer-files/da-vinci-script/dist \
 --scripts installer-files/da-vinci-script/post_install \
 script.pkg
 
-<---Similarly for the GUI, we use pyinstaller to create a single executable for the <--- GUI in dist directory. That is the only fileput inside gui.pkg-->
+<---Similarly for the GUI, we use pyinstaller to create a single executable for the 
+<--- GUI placed in the dist directory. That is the only file put inside gui.pkg
 
 pyinstaller --onefile \
 --add-data "$(pwd)/installer-files/User-Interface-Application/src/file.ui:." \
@@ -28,7 +29,7 @@ pyinstaller --onefile \
 
 <---- This command creates the .pkg file for the GUIAPP file ------>
 <-- NOTE: This app will be an entire repository that has to become a standalone file
-<-- for this to work, for now use a test folder ----->
+<-- The previous step packaged the fffolder User-Interface-Application into an executable ----->
 pkgbuild --root installer-files/User-Interface-Application/dist \
 --install-location "/tmp/ai-gui_temp" \
 --identifier com.company_name.guiapp \
