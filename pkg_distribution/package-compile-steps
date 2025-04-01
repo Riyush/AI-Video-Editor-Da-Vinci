@@ -51,6 +51,8 @@ support.pkg
 <----- This final command combines all 3 above .pkg files into 1 pkg for distribution ---->
 <-- Note that package-path flag gets all .pkg files in the current directory -->
 <-- Resources gets any extra files from the installer_files directory -->
+<--- For now this works, final_installer.pkg gets created and running the download works --->
+<--- I will have to make the installer look nicer in the future but it works --->
 
 productbuild --distribution pkg_distribution/distribution.xml \
   --package-path . \
