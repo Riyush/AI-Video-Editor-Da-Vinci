@@ -3,50 +3,76 @@ import socket
 import json
 import os
 
+from .socket_message_handler import message_handler
+
 def setup_socket():
     """
     Setup a unix socket on the user's computer. This socket creates a server-client
     architecture where the 2 components can communicate. I will have to think about
     the socket file path carefully
     """
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    
+    # Set the socket to non-blocking mode FOR NOW keep it blocking
+    #server_socket.setblocking(True)
+
     socket_path = f"/tmp/gaminghighlights_{os.getpid()}.sock"  # Unique per process
+    pid = os.getpid()
     if os.path.exists(socket_path):
-       os.remove(socket_path)
+        try:
+            os.remove(socket_path)
+        except OSError as e:
+            print(f"Warning: Could not remove existing socket file: {e}")
     try:
-        sock.bind(socket_path)
-        sock.listen(1)
+        record_socket_path(socket_path, pid)
+        server_socket.bind(socket_path)
+        server_socket.listen(1)
     except socket.error as e:
         print(f"Socket setup failed: {e}")
         raise
-    return sock
+    return server_socket
 
+def record_socket_path(socket_path, pid):
+    config_dir = os.path.expanduser("~/Library/Application Support/AI-Video-Editor")
+    os.makedirs(config_dir, exist_ok=True)
+    config_path = os.path.join(config_dir, "ipc_config.json")
 
-def listen_for_requests(socket, media_pool):
+    with open(config_path, "w") as f:
+        json.dump({"socket_path": socket_path, "pid": pid}, f)
+
+def listen_for_requests(sock):
     """
     After creating a socket, setup a loop to indefinitely listen for new requests
     from the GUI. These requests are user commands indicating how they want a video edited.
 
     Args:
-        socket: The Unix socket object from setup_socket().
-        media_pool: Resolve MediaPool object for timeline actions (temporary arg).
+        socket [socket.socket]: The Unix socket object from setup_socket().
     """
 
-    print("Listening for UI connection...")
     try:
-        conn, _ = socket.accept()
+        print("Waiting for GUI Connection")
+        # This line says: “I, the script (server), have created a Unix socket 
+        # and I'm now waiting for a client (GUI) to connect to it.”
+        conn, _ = sock.accept()
         with conn:
-            print("Connected to GUI")
+            # GUI client is connected
             while True:
+                print("Listening for GUI Messages...")
                 raw_data = conn.recv(1024).decode()
                 if not raw_data:  # GUI disconnected
+                    # If this block triggers, the GUI has closed, so we can safely delete .sock and ipc.config files
+                    cleanup_socket_files()
                     break
                 try:
+                    # Get data which should be in the form of a dictionary
                     data = json.loads(raw_data)
-                    print(f"Received payload: {data}")
-                    # Here we need code to process the payload
-                    response = {"status": "received", "payload": data}
-                    conn.send(json.dumps(response).encode())
+                    print(f'data received: {data}')
+                    # Pass the data which should be a dictionary to the message handler
+                    response = message_handler(data)
+                    print(f'response to send: {response}')
+                    # Send a response back to the GUI once message is processed
+                    conn.send((json.dumps(response) + '\n').encode('utf-8'))
+
                 except json.JSONDecodeError as e:
                     print(f"Invalid JSON from GUI: {e}")
                     conn.send(json.dumps({"status": "error", "message": "Invalid JSON"}).encode())
@@ -54,5 +80,33 @@ def listen_for_requests(socket, media_pool):
     except socket.error as e:
         print(f"Socket error: {e}")
     finally:
-        socket.close()
+        sock.close()
         print("Script exiting...")
+
+# Code to delete lingering files upon termination of the script
+def cleanup_socket_files():
+    config_path = os.path.expanduser("~/Library/Application Support/AI-Video-Editor/ipc_config.json")
+
+    try:
+        if os.path.exists(config_path):
+            with open(config_path, "r") as f:
+                config = json.load(f)
+                socket_path = config.get("socket_path")
+
+                if socket_path and os.path.exists(socket_path):
+                    try:
+                        os.remove(socket_path)
+                        print(f"Removed socket file: {socket_path}")
+                    except OSError as e:
+                        print(f"Failed to remove socket file: {e}")
+
+            try:
+                os.remove(config_path)
+                print(f"Removed config file: {config_path}")
+            except OSError as e:
+                print(f"Failed to remove config file: {e}")
+        else:
+            print("No config file found. Nothing to clean up.")
+
+    except Exception as e:
+        print(f"Error during cleanup: {e}")
