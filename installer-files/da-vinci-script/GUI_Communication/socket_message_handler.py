@@ -1,6 +1,5 @@
 
 def message_handler(data):
-    print(f"socket data: {data}")
     """This function receives the json data from the socket, evaluates the 
         'type' key and does some behavior to handle the message.
         Becuase all messages are standardized to json, this function exploits that

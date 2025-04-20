@@ -18,6 +18,7 @@ def setup_socket():
 
     socket_path = f"/tmp/gaminghighlights_{os.getpid()}.sock"  # Unique per process
     pid = os.getpid()
+    #Cleanup an existing socket file
     if os.path.exists(socket_path):
         try:
             os.remove(socket_path)
