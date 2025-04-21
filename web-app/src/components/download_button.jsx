@@ -6,14 +6,14 @@ import resolveLogo from "../assets/resolve-logo.png";
 // function to download from firebase
 function downloadInstaller() {
     // ✅ Reference to your `.pkg` file in Firebase Storage
-    const storageRef = ref(storage, "final_installer.pkg");
+    const storageRef = ref(storage, "GameTime.pkg");
 
     // ✅ Get the direct URL for download and download to user machine
     getDownloadURL(storageRef)
     .then(url => {
       const link = document.createElement("a");
       link.href = url;
-      link.download = "final_installer.pkg"; // Suggests filename
+      link.download = "GameTime.pkg"; // Suggests filename
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

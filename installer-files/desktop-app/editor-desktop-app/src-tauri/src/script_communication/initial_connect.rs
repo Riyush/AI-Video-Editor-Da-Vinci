@@ -26,16 +26,23 @@ struct Payload {
 // Attempt to get the path of a socket opened by the script
 // NOTE: This depends on an existing file created by the script in Application Support
 pub fn get_script_socket_path() -> Option<String> {
-    let mut config_path = dirs::data_dir()?;  // Gets ~/Library/Application Support on macOS;
+    // First, check try global Application Support
+    let mut global_config_path = PathBuf::from("/Library/Application Support/AI-Video-Editor/ipc_config.json");
 
-    config_path.push("AI-Video-Editor/ipc_config.json");
-
-    // Check if the script actually created the config file
-    if config_path.exists() {
-        Some(config_path.to_string_lossy().into_owned())
-    } else {
-        None
+    if global_config_path.exists() {
+        
+        return Some(global_config_path.to_string_lossy().into_owned());
+    } 
+    
+    // Then try /tmp directory
+    let mut tmp_config_path = PathBuf::from("/tmp/ipc_config.json");
+    
+    if tmp_config_path.exists() {
+        
+        return Some(tmp_config_path.to_string_lossy().into_owned());
     }
+
+    None
 
 }
 // Attempt to connect to the socket path. The success vs failure of this function needs to 

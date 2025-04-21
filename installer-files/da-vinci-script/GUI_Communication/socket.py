@@ -2,6 +2,7 @@ import sys
 import socket
 import json
 import os
+import tempfile
 
 from .socket_message_handler import message_handler
 
@@ -25,29 +26,39 @@ def setup_socket():
         except OSError as e:
             print(f"Warning: Could not remove existing socket file: {e}")
     try:
-        record_socket_path(socket_path, pid)
+        path_location = record_socket_path(socket_path, pid)
         server_socket.bind(socket_path)
         server_socket.listen(1)
     except socket.error as e:
         print(f"Socket setup failed: {e}")
         raise
-    return server_socket
+    return server_socket, path_location
 
 def record_socket_path(socket_path, pid):
-    config_dir = os.path.expanduser("~/Library/Application Support/AI-Video-Editor")
-    os.makedirs(config_dir, exist_ok=True)
-    config_path = os.path.join(config_dir, "ipc_config.json")
+    # Try to create record ipc_config file in Application Support
+    config_dir = "/Library/Application Support/AI-Video-Editor"
+    if os.access(config_dir, os.W_OK):
+        config_path = os.path.join(config_dir, "ipc_config.json")
+    # Instead create it in /tmp
+    else:
+        config_dir = "/tmp"
+        config_path = os.path.join(config_dir, "ipc_config.json")
 
+    os.makedirs(config_dir, exist_ok=True)  # Now we make sure the chosen dir exists
+    print(config_path)
     with open(config_path, "w") as f:
         json.dump({"socket_path": socket_path, "pid": pid}, f)
 
-def listen_for_requests(sock):
+    return config_path
+
+def listen_for_requests(sock, path_location):
     """
     After creating a socket, setup a loop to indefinitely listen for new requests
     from the GUI. These requests are user commands indicating how they want a video edited.
 
     Args:
         socket [socket.socket]: The Unix socket object from setup_socket().
+        path_location [string]: Location of the ipc_config.json used to clean up code
     """
 
     try:
@@ -62,7 +73,7 @@ def listen_for_requests(sock):
                 raw_data = conn.recv(1024).decode()
                 if not raw_data:  # GUI disconnected
                     # If this block triggers, the GUI has closed, so we can safely delete .sock and ipc.config files
-                    cleanup_socket_files()
+                    cleanup_socket_files(path_location)
                     break
                 try:
                     # Get data which should be in the form of a dictionary
@@ -85,9 +96,7 @@ def listen_for_requests(sock):
         print("Script exiting...")
 
 # Code to delete lingering files upon termination of the script
-def cleanup_socket_files():
-    config_path = os.path.expanduser("~/Library/Application Support/AI-Video-Editor/ipc_config.json")
-
+def cleanup_socket_files(config_path):
     try:
         if os.path.exists(config_path):
             with open(config_path, "r") as f:

@@ -11,7 +11,7 @@ from GUI_Communication.open_GUI import launch_GUI
 #timeline = project.GetCurrentTimeline()
 
 if __name__ == "__main__":
-    socket = setup_socket()     # Setup the unix socket for GUI to connect to
+    socket, path_location = setup_socket()     # Setup the unix socket for GUI to connect to
     #launch_GUI()                # This needs to be fixed to point to new GUI
-    listen_for_requests(socket)
+    listen_for_requests(socket, path_location)
     
