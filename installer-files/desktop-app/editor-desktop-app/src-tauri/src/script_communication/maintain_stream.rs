@@ -64,7 +64,7 @@ pub fn maintain_socket_connection(stream: UnixStream, app_handle: tauri::AppHand
             }
             Ok(_) => {
                 // NEED to implement a response handler function to pass the message to 
-                socket_response_handler(response);
+                socket_response_handler(response, app_handle.clone());
             }
             Err(ref e) if e.kind() == WouldBlock => {
                 // No message yet — just skip this iteration to not block the loop

@@ -17,10 +17,12 @@ def message_handler(data):
             # then the GUI knows the script is running, the socket is running, and the GUI can 
             # prompt the user to login
             response = {}
+            response["type"] = "GUI_Startup_Success"
             response["status"] = "success"
             response["payload"] = {}
         case _:
             response = {}
+            response["type"] = "ERROR"
             response["status"] = "Failure"
             response["payload"] = {"Error": "Invalid Message sent via Socket"}
     

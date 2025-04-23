@@ -7,9 +7,9 @@ struct Payload {
     message: String,
 }
 
-// This function creates events based on what events are needed at the time
+// This function emits events based on what events are needed at the time
 #[tauri::command]
-fn send_global_message(app: &AppHandle, command: &str, parameters: HashMap<String, String>) {
+pub fn send_global_message(app: AppHandle, command: &str, parameters: HashMap<String, String>) {
     match command{
         "socket_success" => 
         {
