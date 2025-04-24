@@ -4,8 +4,9 @@
 
 pyinstaller --onefile --distpath installer-files/da-vinci-script/dist installer-files/da-vinci-script/script.py
 
-<---We also create a file main.py which is a python file wrapper of script detectable by Da Vinci --->
-<--- With these 2 files in /dist, we run the pkg command This installs at system level /tmp/ai-editor_temp ---->
+<---We also create a file GameTime.py which is a python file wrapper of script detectable by Da Vinci. The user will only see GameTime in Scripts--->
+
+<--- With these 2 files in /dist, we run the pkg command. This installs at system level /tmp/ai-editor_temp ---->
 <---  When the user downloads, the post-install script puts the script in Fusion/Scripts/Utility/ --->
 pkgbuild --root installer-files/da-vinci-script/dist \
 --install-location "/tmp/ai-editor_temp" \
@@ -15,38 +16,38 @@ pkgbuild --root installer-files/da-vinci-script/dist \
 --scripts installer-files/da-vinci-script/post_install \
 script.pkg
 
-<---Similarly for the GUI, we use pyinstaller to create a single executable for the 
-<--- GUI placed in the dist directory. That is the only file put inside gui.pkg
+<--THIS IS NOW OUTDATED BECUASE WE HAVE A NEW GUI>
+<--- The GUI is a Tauri Application, so deployment is a bit different.
+<--- First compile the App executable with:
 
-pyinstaller --onefile \
---add-data "$(pwd)/installer-files/User-Interface-Application/src/file.ui:." \
---hidden-import PyQt6 \
---hidden-import PyQt6.QtWidgets \
---hidden-import PyQt6.QtCore \
---hidden-import PyQt6.QtGui \
---add-data "$('/Volumes/My Passport for Mac/Coding Projects/AI-Video-Editor-Da-Vinci/ai-env/bin/python3' -c 'import PyQt6; print(PyQt6.__path__[0])')/Qt6/plugins:PyQt6/Qt6/plugins" \
---distpath installer-files/User-Interface-Application/dist installer-files/User-Interface-Application/src/main_window.py
+      npm run tauri build
 
-<---- This command creates the .pkg file for the GUIAPP file ------>
-<-- NOTE: This app will be an entire repository that has to become a standalone file
-<-- The previous step packaged the fffolder User-Interface-Application into an executable ----->
-pkgbuild --root installer-files/User-Interface-Application/dist \
---install-location "/tmp/ai-gui_temp" \
---identifier com.company_name.guiapp \
+<--- This Creates the MacOS bundle in:
+      src-tauri/target/release/bundle/macos/GameTime.app
+
+<--- That is the only file put inside gui.pkg
+
+<---- Now create the .pkg file for the GUIAPP file by targeting GameTime.app------>
+<-- NOTE: we simply put the 
+
+pkgbuild --root installer-files/desktop-app/editor-desktop-app/src-tauri/target/release/bundle/macos \
+--install-location "/Applications" \
+--identifier com.gametime.guiapp \
 --version 1.0 \
 --ownership recommended \
---scripts installer-files/User-Interface-Application/post_install \
 guiapp.pkg
 
 <----- This command createss the .pkg file for the config file ------>
 
 pkgbuild --root installer-files/Support-Files/dist \
 --install-location "/tmp/ai-config" \
---identifier com.company_name.supportfiles \
+--identifier com.gametime.supportfiles \
 --version 1.0 \
 --ownership recommended \
 --scripts installer-files/Support-Files/post_install \
 support.pkg
+
+<--- NOTE!!, the user will see GameTime in all spots but the Application Support Directory, that we created is currently called AI-Video-Editor.
 
 <----- This final command combines all 3 above .pkg files into 1 pkg for distribution ---->
 <-- Note that package-path flag gets all .pkg files in the current directory -->
@@ -57,4 +58,4 @@ support.pkg
 productbuild --distribution pkg_distribution/distribution.xml \
   --package-path . \
   --resources ./installer-files \
-  final_installer.pkg
+  GameTime.pkg

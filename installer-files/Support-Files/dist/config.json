@@ -1,4 +1,4 @@
 {
-  "script_path": "~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/main.py",
-  "gui_path": "~/Library/Application Support/AI-Video-Editor/main_window"
+  "script_path": "~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility/GameTime.py",
+  "gui_path": "/Applications/GameTime.app"
 }

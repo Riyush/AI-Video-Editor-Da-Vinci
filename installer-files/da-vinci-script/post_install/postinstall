@@ -4,3 +4,9 @@ DEST="$HOME/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion
 mkdir -p "$DEST"
 cp -R "$3/tmp/ai-editor_temp/"* "$DEST/"
 rm -rf "$3/tmp/ai-editor_temp"  # Clean up
+
+# Create and set permissions for AI-Video-Editor directory in global App support
+mkdir -p "/Library/Application Support/AI-Video-Editor"
+
+# Make sure it is writable by the user
+chmod 777 "/Library/Application Support/AI-Video-Editor"

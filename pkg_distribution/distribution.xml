@@ -7,24 +7,24 @@
     <license file="./extras/license.txt"/>
     
     <choices-outline>
-        <line choice="com.company_name.script"/>
-        <line choice="com.company_name.guiapp"/>
-        <line choice="com.company_name.supportfiles"/>
+        <line choice="com.gametime.script"/>
+        <line choice="com.gametime.guiapp"/>
+        <line choice="com.gametime.supportfiles"/>
     </choices-outline>
 
-    <choice id="com.company_name.script" visible="true" title="Install Script">
-        <pkg-ref id="com.company_name.script"/>
+    <choice id="com.gametime.script" visible="true" title="Install Script">
+        <pkg-ref id="com.gametime.script"/>
     </choice>
 
-    <choice id="com.company_name.guiapp" visible="true" title="Install GUI">
-        <pkg-ref id="com.company_name.guiapp"/>
+    <choice id="com.gametime.guiapp" visible="true" title="Install GUI">
+        <pkg-ref id="com.gametime.guiapp"/>
     </choice>
 
-    <choice id="com.company_name.supportfiles" visible="true" title="Install Support Files">
-        <pkg-ref id="com.company_name.supportfiles"/>
+    <choice id="com.gametime.supportfiles" visible="true" title="Install Support Files">
+        <pkg-ref id="com.gametime.supportfiles"/>
     </choice>
 
-    <pkg-ref id="com.company_name.script" installKBytes="1024" version="1.0">#script.pkg</pkg-ref>
-    <pkg-ref id="com.company_name.guiapp" installKBytes="20480" version="1.0">#guiapp.pkg</pkg-ref>
-    <pkg-ref id="com.company_name.supportfiles" installKBytes="512" version="1.0">#support.pkg</pkg-ref>
+    <pkg-ref id="com.gametime.script" installKBytes="1024" version="1.0">#script.pkg</pkg-ref>
+    <pkg-ref id="com.gametime.guiapp" installKBytes="20480" version="1.0">#guiapp.pkg</pkg-ref>
+    <pkg-ref id="com.gametime.supportfiles" installKBytes="512" version="1.0">#support.pkg</pkg-ref>
 </installer-gui-script>
