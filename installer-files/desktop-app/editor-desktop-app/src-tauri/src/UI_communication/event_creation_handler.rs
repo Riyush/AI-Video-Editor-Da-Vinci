@@ -1,6 +1,9 @@
-use tauri::{AppHandle, Emitter}; // Needed for `emit_all`
+use tauri::{AppHandle, Emitter, Manager}; // Needed for `emit_all`
 use std::collections::HashMap;
 use serde::Serialize;
+use std::thread;
+use std::time::Duration;
+use crate::App_State::app_state::AppState;
 
 #[derive(Clone, Serialize)]
 struct Payload {
@@ -8,7 +11,6 @@ struct Payload {
 }
 
 // This function emits events based on what events are needed at the time
-#[tauri::command]
 pub fn send_global_message(app: AppHandle, command: &str, parameters: HashMap<String, String>) {
     match command{
         "socket_success" => 
@@ -16,7 +18,26 @@ pub fn send_global_message(app: AppHandle, command: &str, parameters: HashMap<St
             let payload = Payload {
                 message: "Successfully connected to script socket".into(),
             };
-            app.emit("prompt-user-to-login", payload).unwrap();
+            // Check for frontend to be fully mounted
+            let app_clone = app.clone();
+
+            thread::spawn(move || {
+                loop {
+                        let state = app_clone.state::<AppState>();
+                        let gui_loaded = state.gui_loaded.lock().unwrap();
+
+                        println!("[DEBUG] Checking GUI loaded state: {}", *gui_loaded);
+
+                        if *gui_loaded {
+                            thread::sleep(Duration::from_millis(1000));
+                            println!("[DEBUG] GUI is loaded — emitting event now.");
+
+                            app_clone.emit("prompt-user-to-login", payload.clone()).unwrap();
+                            break;
+                        }
+                    thread::sleep(Duration::from_millis(1000));
+                }
+            });
         },
         "socket_failure" =>
         {

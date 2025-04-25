@@ -52,6 +52,8 @@ pub fn maintain_socket_connection(stream: UnixStream, app_handle: tauri::AppHand
         if let Ok(msg_from_frontend) = receiver.try_recv() {
             println!("Main thread says: {:#?}", msg_from_frontend);
             // Need code here to process the message and do any needed functionality
+            // This block is for the future when message originate from the User via UI
+            // A file like receive_GUI_message will make calls to send_socket_message::send_message_via_socket() 
         }
 
         // 👂 Check for messages from the script (non-blocking read for now)
