@@ -1,8 +1,17 @@
 import React from 'react';
 import { Box, SimpleGrid, Text, Image, Button, Flex } from '@chakra-ui/react';
 import launchDemoImage from '../assets/GameTime_Launch_Demo.png';
+import {invoke} from '@tauri-apps/api/core';
+import { useState, useEffect } from "react";
 
 function Home() {
+  useEffect(() => {
+    // Notify backend that the GUI is fully loaded
+    invoke('GUI_Loaded')
+      .then(() => console.log("Tauri command GUI_Loaded was invoked"))
+      .catch(err => console.error("Failed to invoke GUI_Loaded:", err));
+  }, []);
+
   return (
     <Box 
     minH="100vh" // full height of screen
