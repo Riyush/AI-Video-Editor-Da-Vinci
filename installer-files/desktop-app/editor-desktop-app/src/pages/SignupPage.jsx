@@ -1,0 +1,65 @@
+import React from 'react';
+import { useState } from "react";
+import {Box, Text, Button, VStack} from '@chakra-ui/react';
+
+// Import Components
+import EmailInput from '../components/login_page/Email-Input';
+import PasswordInput from '../components/login_page/Password-Input';
+import SubmitFormButton from '../components/login_page/Submit-Form-Button';
+import RedirectPageButton from '../components/login_page/Redirect-Page-Button';
+
+import { signup } from '../utils/firebase/signup_function';
+
+function SignUpPage( {navigate}) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    
+    const handleEmailChange = (e) => setEmail(e.target.value);
+    const handlePasswordChange = (e) => setPassword(e.target.value);
+    return (
+        <Box
+        minH='100vh'
+        bgGradient="radial(black, gray.900)">
+        <VStack>
+            <Text
+            pt={14}
+            pb= {2}
+            textAlign={"center"}
+            bgGradient='linear(to-b, white, orange.400)'
+            bgClip='text'
+            fontSize='5xl'
+            fontWeight='extrabold'> Create New Account</Text>
+
+            <EmailInput 
+                value={email} 
+                onChange={handleEmailChange}
+            />
+            <PasswordInput 
+                value={password} 
+                onChange={handlePasswordChange}
+            />
+            <SubmitFormButton  text = "Create New Account" functionality={() => signup(email, password)}/>
+            <Text
+                pt= {16}
+                color="orange.400"
+                fontWeight={"bold"}
+                fontSize='3xl'
+                bgGradient='linear(to-b, orange, white)'
+                bgClip='text'
+                > Returning User?</Text>
+            <RedirectPageButton 
+                DisplayText="Back to Log In"
+                navigate={navigate}
+                page="login"/>
+
+            
+
+
+
+
+        </VStack>
+        </Box>
+    )
+}
+
+export default SignUpPage;
