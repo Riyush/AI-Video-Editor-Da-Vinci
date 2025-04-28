@@ -7,8 +7,12 @@ import EmailInput from '../components/login_page/Email-Input';
 import PasswordInput from '../components/login_page/Password-Input';
 import SubmitFormButton from '../components/login_page/Submit-Form-Button';
 import RedirectPageButton from '../components/login_page/Redirect-Page-Button';
+import GoogleButton from '../components/login_page/Google-Button';
 
 import { signup } from '../utils/firebase/signup_function';
+
+// NOTE, I commented out the Google button, To add it:
+// /*<GoogleButton text="Log In With Google" navigate={navigate}/>*/
 
 function SignUpPage( {navigate}) {
     const [email, setEmail] = useState('');
@@ -39,8 +43,9 @@ function SignUpPage( {navigate}) {
                 onChange={handlePasswordChange}
             />
             <SubmitFormButton  text = "Create New Account" functionality={() => signup(email, password)}/>
+            <GoogleButton text="Sign Up With Google" navigate={navigate}/>
             <Text
-                pt= {16}
+                pt= {10}
                 color="orange.400"
                 fontWeight={"bold"}
                 fontSize='3xl'

@@ -9,9 +9,14 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+// Auth domain based on hosting location
+const localAuthDomain = "localhost";
+const firebaseAuthDomain = "ai-video-editor-8b9db.firebaseapp.com";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBIO3eacRFSrFmkzdXanmzKjiSEXoqO82E",
-  authDomain: "ai-video-editor-8b9db.firebaseapp.com",
+  authDomain: firebaseAuthDomain,
   projectId: "ai-video-editor-8b9db",
   storageBucket: "ai-video-editor-8b9db.firebasestorage.app",
   messagingSenderId: "25800069178",

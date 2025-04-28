@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithRedirect, signInWithPopup } from "firebase/auth";
 import { auth, provider } from "./initialize_firebase_API";
 
 // Login via normal account
@@ -14,11 +14,13 @@ export async function login(email, password) {
 }
 
 //Login via Google
+// This function handles login and new user creation
+// auth is a variable derived from: getAuth(app), app comes from initializeApp(config)
+// provider is created using GoogleAuthProvider() from Firebase
 export async function handleGoogleLogin() {
   try {
-    const result = await signInWithPopup(auth, provider);
-    console.log("User signed in:", result.user);
-    return result.user;
+    await signInWithRedirect(auth, provider);
+    // due to page redirect, no code after the signInWithRedirect call runs
   } catch (error) {
     console.error("Google sign-in error:", error.message);
     throw error;

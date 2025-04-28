@@ -1,5 +1,5 @@
     import React from 'react';
-    import { useState } from "react";
+    import { useState, useEffect } from "react";
     import {Box, Text, Button, VStack} from '@chakra-ui/react';
     import { login } from '../utils/firebase/login_function';
 
@@ -7,9 +7,11 @@
     import EmailInput from '../components/login_page/Email-Input';
     import PasswordInput from '../components/login_page/Password-Input';
     import SubmitFormButton from '../components/login_page/Submit-Form-Button';
-    import GoogleLoginButton from '../components/login_page/Google-Login-Button';
+    import GoogleButton from '../components/login_page/Google-Button';
     import RedirectPageButton from '../components/login_page/Redirect-Page-Button';
 
+    // NOTE, I commented out the Google button, To add it:
+    // /*<GoogleButton text="Log In With Google" navigate={navigate}/>*/
     function LoginPage({navigate}) {
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
@@ -41,10 +43,10 @@
                 onChange={handlePasswordChange}/>
 
                 <SubmitFormButton text="Log In" functionality={() => login(email, password)}/>
-                <GoogleLoginButton/>
+                <GoogleButton text="Log In With Google" navigate={navigate}/>
 
                 <Text
-                pt= {16}
+                pt= {10}
                 color="orange.400"
                 fontWeight={"bold"}
                 fontSize='3xl'
