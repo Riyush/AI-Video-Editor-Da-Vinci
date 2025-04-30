@@ -8,11 +8,12 @@ import PasswordInput from '../components/login_page/Password-Input';
 import SubmitFormButton from '../components/login_page/Submit-Form-Button';
 import RedirectPageButton from '../components/login_page/Redirect-Page-Button';
 import GoogleButton from '../components/login_page/Google-Button';
+import ErrorText from '../components/login_page/Error-Text';
 
 import { signup } from '../utils/firebase/signup_function';
 
 // NOTE, I commented out the Google button, To add it:
-// /*<GoogleButton text="Log In With Google" navigate={navigate}/>*/
+// /*<GoogleButton text="Sign Up With Google" navigate={navigate}/>*/
 
 function SignUpPage( {navigate}) {
     const [email, setEmail] = useState('');
@@ -20,6 +21,10 @@ function SignUpPage( {navigate}) {
     
     const handleEmailChange = (e) => setEmail(e.target.value);
     const handlePasswordChange = (e) => setPassword(e.target.value);
+
+    // error state variables
+    const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     return (
         <Box
         minH='100vh'
@@ -37,13 +42,15 @@ function SignUpPage( {navigate}) {
             <EmailInput 
                 value={email} 
                 onChange={handleEmailChange}
+                error={error}
             />
             <PasswordInput 
                 value={password} 
                 onChange={handlePasswordChange}
+                error={error}
             />
-            <SubmitFormButton  text = "Create New Account" functionality={() => signup(email, password)}/>
-            <GoogleButton text="Sign Up With Google" navigate={navigate}/>
+            <SubmitFormButton  text = "Create New Account" functionality={() => signup(email, password)} setError={setError} setErrorMessage={setErrorMessage}/>
+            <ErrorText error={error} errorMessage={errorMessage}></ErrorText>
             <Text
                 pt= {10}
                 color="orange.400"
@@ -56,11 +63,6 @@ function SignUpPage( {navigate}) {
                 DisplayText="Back to Log In"
                 navigate={navigate}
                 page="login"/>
-
-            
-
-
-
 
         </VStack>
         </Box>
