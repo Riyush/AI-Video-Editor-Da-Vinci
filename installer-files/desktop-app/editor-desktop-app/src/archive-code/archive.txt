@@ -1,0 +1,12 @@
+1. All the files in archive-code include code that was not yet properly implemented, but 
+still of use. The first entry into this folder is code relating to authentication via 
+Google.
+
+I was able to setup authentication via email credentials with Firebase, but
+not quite with Google. So, I decided to put the useEffect hook responsible for
+checking if a user authenticated via google in this folder.  Once, I am can properly
+implement the login via Google process, I will reinstate the useEffect hook.
+The Google Button code will stay as a component because its aesthetic is finalized.
+I just won't put the Google Button on the page. because the actual functionality of 
+signing in via google isn't properly implemented.
+

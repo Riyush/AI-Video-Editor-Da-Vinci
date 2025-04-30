@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 
-import Login from '../pages/LoginPage.jsx';
+//Import All Page Components
 import Home from '../pages/HomePage.jsx';
+import LoginPage from '../pages/LoginPage.jsx';
+import SignUpPage from "../pages/SignupPage.jsx";
 
 import { listen } from '@tauri-apps/api/event';
 
@@ -30,11 +32,13 @@ function App() {
   const renderPage = () => {
     switch (activePage) {
       case 'home':
-        return <Home navigate={setActivePage} />;
+        return <Home />;
       case 'login':
-        return <Login navigate={setActivePage}/>; 
+        return <LoginPage navigate={setActivePage}/>; 
+      case 'signup':
+        return <SignUpPage navigate={setActivePage}/>
       default:
-        return <Home navigate={setActivePage} />; // fallback
+        return <Home />; // fallback page
     }
   };  // Each case is a different page to navigate to
 
