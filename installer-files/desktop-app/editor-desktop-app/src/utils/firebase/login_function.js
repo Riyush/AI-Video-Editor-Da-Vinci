@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signInWithRedirect, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithRedirect, signInWithCustomToken } from "firebase/auth";
 import { auth, provider } from "./initialize_firebase_API";
 
 // Login via normal account
@@ -26,3 +26,18 @@ export async function handleGoogleLogin() {
     throw error;
   }
 }
+
+
+// Login via Google using a custom token (for Tauri)
+/*
+export async function handleGoogleLogin(customToken) {
+  try {
+    const userCredential = await signInWithCustomToken(auth, customToken);
+    console.log("Google login via custom token successful:", userCredential.user);
+    return userCredential.user;
+  } catch (error) {
+    console.error("Google sign-in failed:", error.message);
+    throw error;
+  }
+}
+*/

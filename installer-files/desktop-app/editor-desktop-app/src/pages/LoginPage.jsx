@@ -50,8 +50,9 @@
                 onChange={handlePasswordChange}
                 error={error}
                 />
-                <SubmitFormButton text="Log In" functionality={() => login(email, password)} setError={setError} setErrorMessage={setErrorMessage}/>
+                <SubmitFormButton text="Log In" functionality={() => login(email, password)} setError={setError} setErrorMessage={setErrorMessage} navigate={navigate}/>
                 <ErrorText error={error} errorMessage={errorMessage}></ErrorText>
+                
                 <Text
                 pt= {10}
                 color="orange.400"
