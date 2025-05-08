@@ -49,7 +49,7 @@ function SignUpPage( {navigate}) {
                 onChange={handlePasswordChange}
                 error={error}
             />
-            <SubmitFormButton  text = "Create New Account" functionality={() => signup(email, password)} setError={setError} setErrorMessage={setErrorMessage}/>
+            <SubmitFormButton  text = "Create New Account" functionality={() => signup(email, password)} setError={setError} setErrorMessage={setErrorMessage} navigate={navigate}/>
             <ErrorText error={error} errorMessage={errorMessage}></ErrorText>
             <Text
                 pt= {10}

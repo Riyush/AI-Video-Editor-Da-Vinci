@@ -9,6 +9,7 @@ use GameTime_lib::App_State::app_state::AppState;
 use GameTime_lib::UI_communication::commands;
 // Get the Setup app function
 use GameTime_lib::UI_communication::app_setup::setup_app;
+use tauri_plugin_opener;
 
 // Define backend behaviors of the script
 fn main() {
@@ -21,6 +22,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::GUI_Loaded,
         ])
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| setup_app(app)) // setup app configures state information before launching the actual application
         .run(tauri::generate_context!())
         .expect("failed to run app");
