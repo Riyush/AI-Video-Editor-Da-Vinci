@@ -61,7 +61,7 @@ def check_payment_status(request):
     data = json.loads(request.body)
     session_id = data.get("session_id")
 
-    print(f"session ID: {session_id}")
+    #print(f"session ID: {session_id}")
 
     if not session_id:
         return JsonResponse({'error': 'Missing session_id'}, status=400)

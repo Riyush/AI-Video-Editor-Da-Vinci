@@ -40,6 +40,7 @@ function SubmitFormButton({text, functionality, setError, setErrorMessage, navig
                     
                 }
                 else {
+                    // I don't think I need to pass user information because global state records User ID
                     navigate("user-dashboard");
                 }
 

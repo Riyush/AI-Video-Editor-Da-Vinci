@@ -129,13 +129,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Variable to differentiate production vs developement , depends on env variable
-# export InDevelopment=True
+
 IN_DEVELOPMENT = os.environ.get('InDevelopment') == "True"
 
 env_path = Path(__file__).resolve().parent.parent / '.env'  # Adjust as needed
 
 load_dotenv()  # Only for local dev
+
+# Variable to differentiate production vs developement , depends on env variable
+IN_DEVELOPMENT = os.getenv("InDevelopment")
+
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 PRICE_ID = os.getenv("Price_ID")
 
