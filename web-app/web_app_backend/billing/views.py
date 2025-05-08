@@ -11,6 +11,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 Price_ID = settings.PRICE_ID
 
+print(settings.IN_DEVELOPMENT)
 if settings.IN_DEVELOPMENT:
     success_url = 'http://localhost:8000/success'
     cancel_url = 'http://localhost:1420/cancel'

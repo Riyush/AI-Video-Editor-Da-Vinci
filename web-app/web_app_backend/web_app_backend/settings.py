@@ -142,7 +142,18 @@ IN_DEVELOPMENT = os.getenv("InDevelopment")
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 PRICE_ID = os.getenv("Price_ID")
 
-#Must figure out the origin of the desktop app in the future to correct this
+
+# In development, the desktop app sends request via port 1420, but in production
+# the desktop app can send requests from other places depending on OS and configurations. 
+# This means I need to account for all those origins by allowing them via CORS
+# I've added other potential origins I may encounter in production.
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:1420",
+    "tauri://localhost",
+]
+
+CORS_ALLOWED_ORIGIN_REGEXES = [ 
+    r"^tauri://.*$",
+    r"^app://.*$",
+    r"^file://.*$",  # sometimes used on macOS
 ]
