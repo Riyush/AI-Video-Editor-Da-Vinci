@@ -6,6 +6,7 @@ import LoginPage from '../pages/LoginPage.jsx';
 import SignUpPage from "../pages/SignupPage.jsx";
 import UserDashboardPage from "../pages/UserDashboardPage.jsx";
 import CheckoutWaitingPage from "../pages/CheckoutWaitingPage.jsx";
+import TrialExpiredPage from "../pages/TrialExpiredPage.jsx";
 
 import { listen } from '@tauri-apps/api/event';
 
@@ -38,11 +39,14 @@ function App() {
       case 'login':
         return <LoginPage navigate={setActivePage}/>; 
       case 'signup':
-        return <SignUpPage navigate={setActivePage}/>
+        return <SignUpPage navigate={setActivePage}/>;
       case 'checkout-waiting':
         return <CheckoutWaitingPage navigate={setActivePage} />;
       case 'user-dashboard':
-        return <UserDashboardPage navigate={setActivePage}/>
+        return <UserDashboardPage navigate={setActivePage}/>;
+      case 'free-trial-expired':
+        return <TrialExpiredPage navigate={setActivePage}/>;
+      
       
       default:
         return <Home />; // fallback page

@@ -5,6 +5,7 @@ import {doc, getDoc} from 'firebase/firestore';
 import { db } from '../../utils/firebase/initialize_firebase_API';
 import redirectToStripeCheckout from '../../utils/payment/stripe_redirect';
 import { GlobalContext } from '../../page_hub/GlobalContext';
+import { calculateRemainingTrialDays } from '../../utils/firebase/retrieve_user_details';
 
 function SubmitFormButton({text, functionality, setError, setErrorMessage, navigate}) {
 
@@ -24,25 +25,20 @@ function SubmitFormButton({text, functionality, setError, setErrorMessage, navig
                 const docSnap = await getDoc(userRef);
                 const userData = docSnap.data(); // 👈 this is a plain JS object
 
-                //if the user hasn't setup payment information, send them to payment page
-                if (!userData.hasEnteredPaymentInformation){
-                    // While user checks out, display a waiting page that directs the user to complete checkout
-                    //navigate("payment-waiting-page");
+                // now we have the User details so we can calculate remaining trial days
+                const remainingDays = calculateRemainingTrialDays(userData.createdAt);
 
-                    //This function directs the user to the stripe checkout in browser
-                    const session_id = await redirectToStripeCheckout(userData.email);
-                    
-                    // Set global Stripe Session ID variable to access from the waiting page
-                    setStripeSessionId(session_id);
-
-                    //need to navigate to a waiting page which handles future logic
-                    navigate("checkout-waiting");
-                    
+                // If the user has not paid and their free trial is done as indicated by 0 remaining days
+                // Then we navigate them to a page indicating that trial inspiration with a button for stripe checkout
+                if (!userData.hasEnteredPaymentInformation && remainingDays === 0){
+                    navigate("free-trial-expired");
                 }
                 else {
                     // I don't think I need to pass user information because global state records User ID
                     navigate("user-dashboard");
                 }
+
+                
 
 
             } catch (error) {
