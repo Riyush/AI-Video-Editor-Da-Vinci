@@ -7,6 +7,9 @@ import SignUpPage from "../pages/SignupPage.jsx";
 import UserDashboardPage from "../pages/UserDashboardPage.jsx";
 import CheckoutWaitingPage from "../pages/CheckoutWaitingPage.jsx";
 import TrialExpiredPage from "../pages/TrialExpiredPage.jsx";
+// These are edit pages
+import BasicEditPage from "../pages/BasicEditPage.jsx";
+import ExampleClipFolderPage from "../pages/ExampleClipFolderPage.jsx";
 
 import { listen } from '@tauri-apps/api/event';
 
@@ -46,6 +49,11 @@ function App() {
         return <UserDashboardPage navigate={setActivePage}/>;
       case 'free-trial-expired':
         return <TrialExpiredPage navigate={setActivePage}/>;
+      case 'basic-edit-page':
+        return <BasicEditPage navigate={setActivePage}/>;
+      case 'example-clip-folder':
+        return <ExampleClipFolderPage navigate={setActivePage} />;
+
       
       
       default:
