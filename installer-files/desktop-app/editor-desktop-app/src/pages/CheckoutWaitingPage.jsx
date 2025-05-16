@@ -24,7 +24,7 @@ function CheckoutWaitingPage({navigate}) {
                   stripe_CustomerID: customerIDSuccessfulTransaction
                 });
     
-                navigate('user-dashboard'); // ✅ you may want to consider 'user-dashboard' here instead?
+                navigate('user-dashboard'); // ✅ go back to the dashboard
               } else {
                 navigate('login'); // session has expired without user clicking button, default back to login
               }
