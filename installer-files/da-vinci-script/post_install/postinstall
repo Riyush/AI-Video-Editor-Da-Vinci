@@ -1,12 +1,30 @@
 #!/bin/bash
-# Post-install script to move files to user's Resolve Utility folder
+
+# Absolute path to main_logic install target
+GAMETIME_DIR="/Library/Application Support/GameTime"
+# Source temp install location (resolved via $3)
+SRC="$3/tmp/ai-editor_temp"
+# Create and set permissions for AI-Video-Editor directory in global App support
+mkdir -p "$GAMETIME_DIR"
+# Set user-writable permissions for main_logic directory
+chmod 755 "$GAMETIME_DIR"
+
+# Post-install script to move main entrypoint file GameTime.py to user's Resolve Utility folder
 DEST="$HOME/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility"
 mkdir -p "$DEST"
-cp -R "$3/tmp/ai-editor_temp/"* "$DEST/"
+mv "$SRC/GameTime.py" "$DEST/" # Only move Gametime.py
+
+# with Gametime.py moved, we need to move the main_logic directory to another location
+cp -R "$SRC/main_logic" "$GAMETIME_DIR/"
+
 rm -rf "$3/tmp/ai-editor_temp"  # Clean up
 
-# Create and set permissions for AI-Video-Editor directory in global App support
-mkdir -p "/Library/Application Support/AI-Video-Editor"
+
+### EXPERIMENTAL to see if I can do everything in user folder
+
+# Create and set permissions for GameTime directory in user folder 
+mkdir -p "$HOME/Library/Application Support/GameTime"
 
 # Make sure it is writable by the user
-chmod 777 "/Library/Application Support/AI-Video-Editor"
+chmod 777 "$HOME/Library/Application Support/GameTime"
+

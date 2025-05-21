@@ -12,6 +12,11 @@ pub fn socket_response_handler(response: String, app: AppHandle) {
     // Consider that in the future, all responses will be in JSON format
     let parsed: Result<HashMap<String, Value>, _> = serde_json::from_str(&response);
 
+    //match &parsed {
+    //Ok(map) => println!("{:#?}", map), // Pretty-print the map
+    //Err(e) => eprintln!("Failed to parse JSON: {}", e),
+    //}
+
     match parsed {
         Ok(map) => {
             match map.get("type").and_then(|v| v.as_str()) {

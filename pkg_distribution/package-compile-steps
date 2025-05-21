@@ -1,12 +1,16 @@
+<--- Creating the script file has become obsolete. Now. I simply plug all logic into a main folder directory that gets seperately installed in the root /Library/Application Support/Gametime directory. We need to ensure that this folder is accessible to the script which is in the Scripts folder--->
+
+<-- OBSOLETE -->
 <---- This command creates .pkg for the script file ----->
 <---First, we create a single executable script which compiles all the files
 <--- in da-vinci-script into a single executable called script with the below command
 
 pyinstaller --onefile --distpath installer-files/da-vinci-script/dist installer-files/da-vinci-script/script.py
 
-<---We also create a file GameTime.py which is a python file wrapper of script detectable by Da Vinci. The user will only see GameTime in Scripts--->
+<---We create a file GameTime.py which is a python file designed to call the main logic in another location on user's computer in simple python. The user will only see GameTime in Scripts--->
+<--- We designed the main_logic directory to expect a simple function call from GameTime.py via the script.py entrypoint file to run the code that interfaces with Resolve --->
 
-<--- With these 2 files in /dist, we run the pkg command. This installs at system level /tmp/ai-editor_temp ---->
+<--- With these 2 components in /dist, we run the pkg command. This installs at system level /tmp/ai-editor_temp ---->
 <---  When the user downloads, the post-install script puts the script in Fusion/Scripts/Utility/ --->
 pkgbuild --root installer-files/da-vinci-script/dist \
 --install-location "/tmp/ai-editor_temp" \
