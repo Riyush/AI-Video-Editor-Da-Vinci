@@ -18,6 +18,12 @@ pub fn send_message_via_socket(
                 "params": parameters
             })
         }
+        "Basic-Edit-Job" => {
+            serde_json::json!({
+                "type": message_type,
+                "params": parameters
+            })
+        }
         _ => {
             // Default handler for other message types
             serde_json::json!({
@@ -27,6 +33,8 @@ pub fn send_message_via_socket(
         }
     };
     let serialized = payload.to_string();
+
+
     stream.write_all(serialized.as_bytes())?;
     stream.flush()?;
 

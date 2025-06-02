@@ -1,0 +1,26 @@
+[
+  {
+    "Sm2Timeline_id": "8018b51a-937c-494b-a3b3-8714f1bebcc7",
+    "DbType": "Sm2Timeline",
+    "Name": "GameTime",
+    "OfflineClip": null,
+    "OfflineFrameOffset": 0,
+    "PTZRPreset": "4b6b4f95-dd35-4371-bf69-f1c714d082ef",
+    "PTZRPresetType": 0,
+    "VideoStereoSource": 0,
+    "Type": 0,
+    "ImportExportMetadataBA": null,
+    "SM_Project_id": null,
+    "Sequence": "7e158f07-6f7f-4eb3-b850-09c711ae2f0b",
+    "EnableLTC": 0,
+    "LTCSyncDelay": 0.0,
+    "EnableAudio": 0,
+    "AudioSyncDelay": 0.0,
+    "AudioInfo": null,
+    "ModTimeInSecs": 1747949289,
+    "CreateTimeInSecs": 1747949289,
+    "MpTimelineClip": "c471a6d7-aeef-4faf-bfff-478c902d352b",
+    "FieldsBlob": null,
+    "Sm2MpMedia_id": "c471a6d7-aeef-4faf-bfff-478c902d352b"
+  }
+]
