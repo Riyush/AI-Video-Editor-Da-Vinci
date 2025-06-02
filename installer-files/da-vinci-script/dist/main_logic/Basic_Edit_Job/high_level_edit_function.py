@@ -10,6 +10,7 @@ def execute_basic_edit(edit_configurations, resolve):
     
     #check if user has already added all media to the timeline:
     if edit_configurations['added_to_timeline'] =='true':
+        #need to add proper error handling if this line fails
         timeline = proj.GetCurrentTimeline()
     # If not, create timeline and add clips assuming labeled order of clips
     else:
