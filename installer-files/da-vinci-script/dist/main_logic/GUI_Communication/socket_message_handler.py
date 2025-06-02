@@ -1,6 +1,6 @@
-#import Basic_Edit_Job.high_level_edit_function import execute_basic_edit
+from Basic_Edit_Job.high_level_edit_function import execute_basic_edit
 
-def message_handler(data):
+def message_handler(data, resolve):
     """This function receives the json data from the socket, evaluates the 
         'type' key and does some behavior to handle the message.
         Becuase all messages are standardized to json, this function exploits that
@@ -24,12 +24,23 @@ def message_handler(data):
             response["payload"] = {}
         case "Basic-Edit-Job":
             # The socket has received a request to do a basic edit job with user
-            # specified configurations
-            response = {}
-            response["type"] = "Completed_Edit_Job"
-            response["status"] = "success"
-            response["payload"] = {}
-            print(data['params'])
+            # specified configurations. Execute the high level function which 
+            # does all the subtasks associated with a Basic Edit Job
+            configurations = data["params"]
+            try:
+                execute_basic_edit(configurations, resolve)
+
+                response = {}
+                response["type"] = "Completed_Edit_Job"
+                response["status"] = "success"
+                response["payload"] = {}
+            except Exception as e:
+                print(e)
+                response = {}
+                response["type"] = "Failed_Edit_Job"
+                response["status"] = "success"
+                response["payload"] = {"Error Message": e}
+            
 
         case _:
             response = {}

@@ -51,7 +51,7 @@ def record_socket_path(socket_path, pid):
 
     return config_path
 
-def listen_for_requests(sock, path_location):
+def listen_for_requests(sock, path_location, resolve):
     """
     After creating a socket, setup a loop to indefinitely listen for new requests
     from the GUI. These requests are user commands indicating how they want a video edited.
@@ -80,7 +80,7 @@ def listen_for_requests(sock, path_location):
                     data = json.loads(raw_data)
                     print(f'data received: {data}')
                     # Pass the data which should be a dictionary to the message handler
-                    response = message_handler(data)
+                    response = message_handler(data, resolve)
                     print(f'response to send: {response}')
                     # Send a response back to the GUI once message is processed
                     conn.send((json.dumps(response) + '\n').encode('utf-8'))

@@ -1,0 +1,32 @@
+[
+  {
+    "Sm2Sequence_id": "7e158f07-6f7f-4eb3-b850-09c711ae2f0b",
+    "DbType": "Sm2Sequence",
+    "MediaExtents": "24a764e53358e5ab61bcd4f3572e54d65d65c7a9b7e9f4ed437cf07b818f4ccb",
+    "FrameRate": "9d03c0aae076398273d902150e8c9f1b1b6c69d3cb1609016e4df47fe484a736",
+    "Resolution": "4288607fe6fe09b98b77659cf958805a5bd096b116170688e97711e8ae62060c",
+    "Parent": "8018b51a-937c-494b-a3b3-8714f1bebcc7",
+    "pLmVerTable": "26d6ec03-27ff-4fca-8654-2d49494d8480",
+    "GroupList": null,
+    "CrntGroup": null,
+    "TimelineFilter": null,
+    "LastChangedTime": 0,
+    "RenderCacheBA": "413f5a2c8441fb1da2059731bbcfcdd909fbf11262de506835ef455c97d57f4b",
+    "UIElementsState": "9bf65edf37e3dc263779e1958cd4bb96b268334b7ac85956edb0bf68203982af",
+    "NumOutputAudioChannels": 2,
+    "OutputAudioGain": 0.0,
+    "Sm2Timeline_id": "8018b51a-937c-494b-a3b3-8714f1bebcc7",
+    "Sm2MpMedia_id": null,
+    "AuxRenderCacheBA": "413f5a2c8441fb1da2059731bbcfcdd909fbf11262de506835ef455c97d57f4b",
+    "UniqueSequenceId": "473e0a1e-c248-4f96-86d2-02f54a8054e8",
+    "PinsBA": null,
+    "ImportExportMetadataBA": null,
+    "FieldsBlob": "8bb892396f6269aa806d26b301de1569f5c8243c4f7555bfa0d3e64add854048",
+    "pAuxLmVerTable": null,
+    "BlobLockSysId": "",
+    "VersionTableLockSysId": "",
+    "LockSysId": "",
+    "DbSavedTime": 19880184759,
+    "LockStatus": 0
+  }
+]
