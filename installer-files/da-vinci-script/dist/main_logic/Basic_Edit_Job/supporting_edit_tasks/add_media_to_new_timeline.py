@@ -11,9 +11,9 @@ def addMediaToNewTimeline(mediaStorage, mediaPool, mediaFolderPath):
     # Sort by name
     clips = sorted(clips, key = lambda clip : clip.GetClipProperty("File Name"))
 
-    # add clips to timeline, each function call returns timeline items
+    # add clips to timeline, each AppendToTimeline function call returns a timeline item
     for clip in clips:
-        mediaPool.AppendToTimeline(clip)
+        timeline_item = mediaPool.AppendToTimeline(clip)       
     
     return timeline
 

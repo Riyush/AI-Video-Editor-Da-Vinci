@@ -7,11 +7,16 @@
 
 pyinstaller --onefile --distpath installer-files/da-vinci-script/dist installer-files/da-vinci-script/script.py
 
-<---We create a file GameTime.py which is a python file designed to call the main logic in another location on user's computer in simple python. The user will only see GameTime in Scripts--->
-<--- We designed the main_logic directory to expect a simple function call from GameTime.py via the script.py entrypoint file to run the code that interfaces with Resolve --->
+<---We create a file GameTime.py which is a python file designed to call the main logic in another location on user's computer in simple python. The user will only see GameTime in:
+~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility 
+From this location, the user can call the script from DaVinci Resolve Scripts Folder
+
+<--- We designed GameTime.py to simply create a resolve object and make a call to the  main_logic directory which actually edits the timeline. The entrypoint to this editing logic is the script.py file which creates a socket to communicate with the GUI --->
 
 <--- With these 2 components in /dist, we run the pkg command. This installs at system level /tmp/ai-editor_temp ---->
-<---  When the user downloads, the post-install script puts the script in Fusion/Scripts/Utility/ --->
+<---  When the user downloads, the post-install script puts the script in Fusion/Scripts/Utility/ and the main_logic directory in:
+/Library/Application Support/Gametime     --->
+
 pkgbuild --root installer-files/da-vinci-script/dist \
 --install-location "/tmp/ai-editor_temp" \
 --identifier com.company_name.script \
@@ -20,7 +25,6 @@ pkgbuild --root installer-files/da-vinci-script/dist \
 --scripts installer-files/da-vinci-script/post_install \
 script.pkg
 
-<--THIS IS NOW OUTDATED BECUASE WE HAVE A NEW GUI>
 <--- The GUI is a Tauri Application, so deployment is a bit different.
 <--- First compile the App executable with:
 
@@ -30,6 +34,8 @@ script.pkg
       src-tauri/target/release/bundle/macos/GameTime.app
 
 <--- That is the only file put inside gui.pkg
+
+<--- Note, it also creates a dmg.sh file which might be useful if I want to package thie application as a dmg instead of a .pkg --->
 
 <---- Now create the .pkg file for the GUIAPP file by targeting GameTime.app------>
 <-- NOTE: we simply put the 

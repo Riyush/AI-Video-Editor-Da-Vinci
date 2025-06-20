@@ -1,5 +1,5 @@
 #!/bin/bash
-# Post-install script to move GUI files to user's Application Support
+# Post-install script to move Support Files files to user's Application Support
 DEST="$HOME/Library/Application Support/AI-Video-Editor"
 mkdir -p "$DEST"
 
