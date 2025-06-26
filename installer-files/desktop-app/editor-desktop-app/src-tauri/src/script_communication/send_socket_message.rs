@@ -8,7 +8,7 @@ use std::os::unix::net::UnixStream;
 pub fn send_message_via_socket(
     stream: &mut UnixStream,
     message_type: String,
-    parameters: HashMap<String, String>,
+    parameters: Value,          // accept any structure of dictionary
 ) -> std::io::Result<()> {
     let payload: Value = match message_type.as_str() {
         "GUI_Startup" => {
@@ -24,6 +24,14 @@ pub fn send_message_via_socket(
                 "params": parameters
             })
         }
+        "Basic-Edit-Part-2-Get-Silence-Timestamps" => {
+            serde_json::json!({
+                "type": message_type,
+                "params": parameters
+            })
+            // this time params includes the dictionary of silence timestamps for 
+            // each media clip on the track
+        }
         _ => {
             // Default handler for other message types
             serde_json::json!({
@@ -32,8 +40,10 @@ pub fn send_message_via_socket(
             })
         }
     };
-    let serialized = payload.to_string();
+    
+    let serialized = format!("{}\n", payload.to_string());
 
+    println!("Serialized payload: {}", serialized);
 
     stream.write_all(serialized.as_bytes())?;
     stream.flush()?;

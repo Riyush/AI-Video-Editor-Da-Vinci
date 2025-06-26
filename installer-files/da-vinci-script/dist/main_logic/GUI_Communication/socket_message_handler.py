@@ -37,7 +37,13 @@ def message_handler(data, resolve):
             response["type"] = "Started_Edit_Job"
             response["status"] = response_status
             response["payload"] = {"message": response_message, "Media_File_Paths": media_file_paths_dict}
-            
+        
+        case "Basic-Edit-Part-2-Get-Silence-Timestamps":
+            silence_timestamps = data["params"]
+            print(silence_timestamps)
+            # create subfunctions to analyze silence timestamps and make edits to timeline
+            # This needs to be based on user 
+            # also delete the wav files upon completion
         case _:
             response = {}
             response["type"] = "ERROR"
