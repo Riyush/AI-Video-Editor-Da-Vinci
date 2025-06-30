@@ -1,6 +1,6 @@
-from Basic_Edit_Job.high_level_edit_function import execute_basic_edit_part_1
+from Basic_Edit_Job.high_level_edit_function import execute_basic_edit_part_1, execute_basic_edit_part_2
 
-def message_handler(data, resolve):
+def message_handler(data, resolve, state_dict):
     """This function receives the json data from the socket, evaluates the 
         'type' key and does some behavior to handle the message.
         Becuase all messages are standardized to json, this function exploits that
@@ -37,13 +37,24 @@ def message_handler(data, resolve):
             response["type"] = "Started_Edit_Job"
             response["status"] = response_status
             response["payload"] = {"message": response_message, "Media_File_Paths": media_file_paths_dict}
+
+            #update state_dict with configurations. This persists the user's edit preferences
+            # for part 2 of the edit job
+            state_dict["configurations"] = configurations
         
         case "Basic-Edit-Part-2-Get-Silence-Timestamps":
             silence_timestamps = data["params"]
-            print(silence_timestamps)
-            # create subfunctions to analyze silence timestamps and make edits to timeline
-            # This needs to be based on user 
-            # also delete the wav files upon completion
+            configurations = state_dict["configurations"]
+            
+            response_status, response_message, payload = execute_basic_edit_part_2(configurations, silence_timestamps, resolve)
+
+            response = {}
+            response["type"] = "Completed_Edit_Job"
+            response["status"] = response_status
+            response["payload"] = {"message": response_message}
+
+            # Need code here to delette the wav files in /Library/Application Support/GameTime/wav_files
+            
         case _:
             response = {}
             response["type"] = "ERROR"

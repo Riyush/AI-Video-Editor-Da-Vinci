@@ -71,6 +71,7 @@ def listen_for_requests(sock, path_location, resolve):
             # Wrap the raw socket in a file-like object that supports readline
             stream = conn.makefile('r')
 
+            state_dict = {}
             # GUI client is connected
             while True:
                 print("Listening for GUI Messages...")
@@ -84,7 +85,7 @@ def listen_for_requests(sock, path_location, resolve):
                     data = json.loads(raw_data)
                     print(f'data received: {data}')
                     # Pass the data which should be a dictionary to the message handler
-                    response = message_handler(data, resolve)
+                    response = message_handler(data, resolve, state_dict)
                     print(f'response to send: {response}')
                     # Send a response back to the GUI once message is processed
                     conn.send((json.dumps(response) + '\n').encode('utf-8'))

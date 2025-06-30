@@ -32,7 +32,7 @@ def convert_media_to_wav_files(audio_file_paths_dict, output_dir = None, sample_
             subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
             wav_paths[track].append(wav_file)
 
-        return wav_paths
+    return wav_paths
     
 if __name__ == "__main__":
     json_input = sys.stdin.read()

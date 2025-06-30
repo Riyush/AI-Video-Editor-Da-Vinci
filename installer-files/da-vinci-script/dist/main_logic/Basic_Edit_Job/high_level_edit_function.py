@@ -54,3 +54,33 @@ def execute_basic_edit_part_1(edit_configurations, resolve):
         # This way, errors are caught and returned to the GUI rather than kill the 
         # GUI - script connection entirely
         return "failure", f"An error occurred: {type(e).__name__} - {e}", {}
+    
+def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve):
+
+    try:
+        # create the necessary objects to pass to support functions
+        mediaStorage = resolve.GetMediaStorage()
+        proj_manager = resolve.GetProjectManager()
+        proj = proj_manager.GetCurrentProject()
+        mediaPool = proj.GetMediaPool()
+
+        timeline = proj.GetCurrentTimeline()
+        timelineState = TimelineState(timeline)
+
+        timelineState.add_markers_to_timestamps(silence_timestamps)
+        #Based on the user's preffered pacing, cut different durations of the silences
+        pacing = edit_configurations["pacing_choice"]
+        match pacing:
+            case "calm":
+                print("Hello")
+            case "normal":
+                print("hello")
+            case "Fast":
+                print("hello")
+
+        return "success", "Completed Basic Edit", {}
+    except Exception as e:
+        # This block will catch any exception and return them to the socket
+        # This way, errors are caught and returned to the GUI rather than kill the 
+        # GUI - script connection entirely
+        return "failure", f"An error occurred: {type(e).__name__} - {e}", {}

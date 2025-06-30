@@ -8,8 +8,6 @@ import os
 import librosa
 import numpy as np
 
-import librosa.core
-import librosa.effects
 import soundfile
 import numba
 import scipy
@@ -88,7 +86,6 @@ if __name__ == "__main__":
     # Parse it into a Python dict
     wav_paths_dict = json.loads(json_input)
 
-    #wav_paths_dict = json.loads(json_input)
     result = detect_silences_in_media(wav_paths_dict)
 
     print(json.dumps(result))
