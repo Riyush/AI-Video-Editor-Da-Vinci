@@ -18,7 +18,7 @@ function BasicEditPage({navigate}) {
     //use cuts and transitions vs none, cuts and transitions will be enhanced with sound effects
     const [useCutsAndTransitions, setUseCutsAndTransitions] = useState(null);
     //enhance audio in Resolve editor or not
-    const [audioEnhancement, setAudioEnhancement] = useState(null);
+    const [silenceRemoval, setSilenceRemoval] = useState(null);
     // Add Captions
     const [addCaptions, setAddCaptions] = useState(null);
     // AutoColor Option
@@ -29,10 +29,10 @@ function BasicEditPage({navigate}) {
         console.log("Folder Path:", clipFolderPath);
         console.log("Pacing Choice:", pacingChoice);
         console.log("Use Cuts and Transitions:", useCutsAndTransitions);
-        console.log("Audio Enhancement:", audioEnhancement);
+        console.log("Silence Removal:", silenceRemoval);
         console.log("Add Captions:", addCaptions);
         console.log("AutoColor:", autoColor);
-    }, [addedToTimeline, clipFolderPath, pacingChoice, useCutsAndTransitions, addCaptions, audioEnhancement, autoColor]);
+    }, [addedToTimeline, clipFolderPath, pacingChoice, useCutsAndTransitions, addCaptions, silenceRemoval, autoColor]);
     return (
         <Box
         minH="100vh" // full height of screen
@@ -167,24 +167,24 @@ function BasicEditPage({navigate}) {
                 bgClip='text'
                 fontSize='2xl'
                 fontWeight='extrabold'
-                >Enhance Audio?</Text>
+                >Remove Silences?</Text>
                 <Button
                     ml={7}
                     w="80px"
                     h="50px"
-                    colorScheme={audioEnhancement === true ? 'green' : 'orange'}
-                    variant={audioEnhancement === true ? 'solid' : 'outline'}
+                    colorScheme={silenceRemoval === true ? 'green' : 'orange'}
+                    variant={silenceRemoval === true ? 'solid' : 'outline'}
                     onClick={() =>{
-                        setAudioEnhancement(true)
+                        setSilenceRemoval(true)
                     }}>Yes</Button>
                     <Button
                     ml={6}
                     w="80px"
                     h="50px"
-                    colorScheme={audioEnhancement === false ? 'green' : 'orange'}
-                    variant={audioEnhancement === false ? 'solid' : 'outline'}
+                    colorScheme={silenceRemoval === false ? 'green' : 'orange'}
+                    variant={silenceRemoval === false ? 'solid' : 'outline'}
                     onClick={() => {
-                        setAudioEnhancement(false)
+                        setSilenceRemoval(false)
                     }}>No</Button>
             </HStack>
             
@@ -254,7 +254,7 @@ function BasicEditPage({navigate}) {
                     clip_folder_path: clipFolderPath,
                     pacing_choice: pacingChoice,
                     use_cuts_and_transitions: useCutsAndTransitions,
-                    audio_enhancement: audioEnhancement,
+                    silence_removal: silenceRemoval,
                     add_captions: addCaptions,
                     auto_color: autoColor,
                 };

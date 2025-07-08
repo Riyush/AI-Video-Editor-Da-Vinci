@@ -1,5 +1,6 @@
 from Basic_Edit_Job.supporting_edit_tasks.add_media_to_new_timeline import addMediaToNewTimeline
 from Basic_Edit_Job.supporting_edit_tasks.timelineState import TimelineState
+from Basic_Edit_Job.supporting_edit_tasks.adapt_timestamps_to_pacing import adapt_timestamps_to_pacing
 #from Basic_Edit_Job.supporting_edit_tasks.detect_silences import detect_silences_in_media
 
 def execute_basic_edit_part_1(edit_configurations, resolve):
@@ -66,17 +67,32 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve):
 
         timeline = proj.GetCurrentTimeline()
         timelineState = TimelineState(timeline)
-
-        timelineState.add_markers_to_timestamps(silence_timestamps)
+        
         #Based on the user's preffered pacing, cut different durations of the silences
+
+        remove_silences = edit_configurations["silence_removal"]
         pacing = edit_configurations["pacing_choice"]
-        match pacing:
-            case "calm":
-                print("Hello")
-            case "normal":
-                print("hello")
-            case "Fast":
-                print("hello")
+        print(timelineState.audio_tracks)
+        print(silence_timestamps)
+        if remove_silences:
+            match pacing:
+                case "calm":
+                    # 1 second of silence in each silence timestamp is preserved
+                    final_silence_timestamps = adapt_timestamps_to_pacing(silence_timestamps, pacing)
+                case "normal":
+                    final_silence_timestamps = adapt_timestamps_to_pacing(silence_timestamps, pacing)
+                case "Fast":
+                    # no processing, just remove silences
+                    final_silence_timestamps = adapt_timestamps_to_pacing(silence_timestamps, pacing)
+                case _:
+                    raise ValueError("invalid pacing choice")
+            
+            print(final_silence_timestamps)
+
+            #add markers to the finalized timestamps
+            timelineState.add_markers_to_timestamps(final_silence_timestamps)
+
+            # Find a way to cut footage between teh start and stop timestamps
 
         return "success", "Completed Basic Edit", {}
     except Exception as e:

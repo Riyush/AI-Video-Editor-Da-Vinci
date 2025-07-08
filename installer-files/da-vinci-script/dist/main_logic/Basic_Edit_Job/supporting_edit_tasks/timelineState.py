@@ -115,8 +115,8 @@ class TimelineState():
         print("hereherhehre")
         frame_rate = self.timeline.GetSetting("timelineFrameRate")
 
-        for video_track_index, video_timeline_items in self.video_tracks.items():
-            for timeline_item in video_timeline_items:
+        for audio_track_index, audio_timeline_items in self.audio_tracks.items():
+            for timeline_item in audio_timeline_items:
                 # Now, I am at a specific item on teh timeline
                 # match the item's name with the path name in timestamps to see
                 # which timestamps need to be applied
@@ -125,11 +125,11 @@ class TimelineState():
                 print(media_base_name)
                 
                 flag = 0
-                for media_file_path, timestamps_list in silence_timestamps[str(video_track_index)].items():
+                for media_file_path, timestamps_list in silence_timestamps[str(audio_track_index)].items():
                     # flag is used to not check excess media files
                     if flag == 1:
                         break
-                    wav_base = os.path.splitext(os.path.basename(media_file_path))[0]
+                    wav_base = media_file_path
                     print(wav_base)
                     if wav_base == media_base_name: # first check if correct, path, if not go to next path
                         print("PASSED!")

@@ -15,7 +15,7 @@ import audioread
 import resampy
 import pooch
 
-def detect_silences_in_media(audio_tracks:dict, silence_thresh_db: float = -10.0, min_silence_len_sec: float = 1.0) ->dict:
+def detect_silences_in_media(audio_tracks:dict, silence_thresh_db: float = -30.0, min_silence_len_sec: float = 1.0) ->dict:
     """
     Detects silence periods in  media files across multiple audio tracks.
     Note, this expects .WAV files
@@ -35,6 +35,7 @@ def detect_silences_in_media(audio_tracks:dict, silence_thresh_db: float = -10.0
         },
     2: ...
     }
+    WE CHANGE THIS STRUCTURE TO USE THE PATH
     """
     silence_timestamps = {}
     for track, file_list in audio_tracks.items():
@@ -50,7 +51,7 @@ def detect_silences_in_media(audio_tracks:dict, silence_thresh_db: float = -10.0
             hop_len = 512
             # Compute RMS and convert to Decibels, RMS is a measure of average volume
             rms = librosa.feature.rms(y=y, frame_length=frame_len, hop_length=hop_len)[0]
-            db = librosa.amplitude_to_db(rms, ref=np.max)
+            db = librosa.amplitude_to_db(rms, ref=1.0) #This sets -30 to be the threshold on absolute scale rather than relative to maximum volume
 
             # Get time stamps for each frame
             times = librosa.frames_to_time(np.arange(len(db)), sr=sr, hop_length=hop_len)
@@ -74,7 +75,10 @@ def detect_silences_in_media(audio_tracks:dict, silence_thresh_db: float = -10.0
             if start_time is not None and (times[-1] - start_time) >= min_silence_len_sec:
                 silences.append((start_time, times[-1]))
 
-            silence_timestamps[track][wav_path] = silences
+            # instead of the original wav path as the key, just use the name 
+            # without its extension to make it easier to index into
+            path_base = os.path.splitext(os.path.basename(wav_path))[0]
+            silence_timestamps[track][path_base] = silences
 
     return silence_timestamps
 
