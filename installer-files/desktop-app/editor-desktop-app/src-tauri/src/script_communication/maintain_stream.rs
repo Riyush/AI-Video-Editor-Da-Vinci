@@ -6,6 +6,7 @@ use std::sync::mpsc::Receiver;
 use std::{thread, time::Duration};
 use tauri::{AppHandle, Emitter}; // Needed for `emit_all`
 use serde_json::Value;
+use serde_json;
 
 use crate::script_communication::initial_connect::*;
 use crate::script_communication::receive_socket_message::socket_response_handler;
@@ -70,7 +71,7 @@ pub fn maintain_socket_connection(
 
             // Process the message into a Hashmap<String, String> to easily pass into send_message_via_socket().
             if let Value::Object(map) = msg_from_frontend {
-                let processed: HashMap<String, String> = map.into_iter().filter_map(|(key, value)| {
+                let mut processed: HashMap<String, String> = map.into_iter().filter_map(|(key, value)| {
 
                     let string_val = match value {
                     Value::Bool(b) => Some(b.to_string()),              // "true"/"false"
@@ -83,10 +84,15 @@ pub fn maintain_socket_connection(
                 }).collect();
 
                 println!("Processed config: {:?}", processed);
+                let processed_json_value = serde_json::to_value(processed).unwrap();
+                // This design is faulty because there is no value in processed that indicates
+                // the type of message being sent from the GUI frontend to this backend thread
+                // We always have type: Basic Edit Job, 
+                // we need some match statement here to determine the message type variable.
 
                 // Now we pass processed as a paramter to send_socket_message which is meant 
                 let message_type = String::from("Basic-Edit-Job");
-                send_message_via_socket(&mut stream, message_type, processed);
+                send_message_via_socket(&mut stream, message_type, processed_json_value);
                 
             } else {
                     eprintln!("Expected a JSON object");
@@ -103,7 +109,7 @@ pub fn maintain_socket_connection(
             }
             Ok(_) => {
                 // NEED to implement a response handler function to pass the message to
-                socket_response_handler(response, app_handle.clone());
+                socket_response_handler(response, app_handle.clone(), &mut stream);
             }
             Err(ref e) if e.kind() == WouldBlock => {
                 // No message yet — just skip this iteration to not block the loop

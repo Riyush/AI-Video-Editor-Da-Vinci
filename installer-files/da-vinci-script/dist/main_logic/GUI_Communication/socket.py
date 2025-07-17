@@ -66,11 +66,16 @@ def listen_for_requests(sock, path_location, resolve):
         # This line says: “I, the script (server), have created a Unix socket 
         # and I'm now waiting for a client (GUI) to connect to it.”
         conn, _ = sock.accept()
+
         with conn:
+            # Wrap the raw socket in a file-like object that supports readline
+            stream = conn.makefile('r')
+
+            state_dict = {}
             # GUI client is connected
             while True:
                 print("Listening for GUI Messages...")
-                raw_data = conn.recv(1024).decode()
+                raw_data = stream.readline()
                 if not raw_data:  # GUI disconnected
                     # If this block triggers, the GUI has closed, so we can safely delete .sock and ipc.config files
                     cleanup_socket_files(path_location)
@@ -80,7 +85,7 @@ def listen_for_requests(sock, path_location, resolve):
                     data = json.loads(raw_data)
                     print(f'data received: {data}')
                     # Pass the data which should be a dictionary to the message handler
-                    response = message_handler(data, resolve)
+                    response = message_handler(data, resolve, state_dict)
                     print(f'response to send: {response}')
                     # Send a response back to the GUI once message is processed
                     conn.send((json.dumps(response) + '\n').encode('utf-8'))

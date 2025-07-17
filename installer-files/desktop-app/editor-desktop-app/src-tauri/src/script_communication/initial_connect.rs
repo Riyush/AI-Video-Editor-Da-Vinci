@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use serde_json;
 use std::collections::HashMap;
 use std::fs;
 use std::io::prelude::*;
@@ -70,7 +71,7 @@ pub fn attempt_connection(config_path: Option<String>, app: AppHandle) -> Option
             let mut stream = UnixStream::connect(ipc_config.socket_path).ok()?;
 
             // Use match to create global tauri event
-            let mut parameters = HashMap::new();
+            let mut parameters: serde_json::Value = serde_json::to_value(HashMap::<String, String>::new()).unwrap();
             send_message_via_socket(&mut stream, String::from("GUI_Startup"), parameters);
 
             Some(stream) // Preserve the stream to handle incoming messages from the script
