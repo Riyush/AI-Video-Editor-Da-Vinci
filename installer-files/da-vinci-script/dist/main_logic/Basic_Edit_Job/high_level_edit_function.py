@@ -1,6 +1,7 @@
 from Basic_Edit_Job.supporting_edit_tasks.add_media_to_new_timeline import addMediaToNewTimeline
 from Basic_Edit_Job.supporting_edit_tasks.timelineState import TimelineState
 from Basic_Edit_Job.supporting_edit_tasks.adapt_timestamps_to_pacing import adapt_timestamps_to_pacing
+from Basic_Edit_Job.supporting_edit_tasks.recreate_finalized_timeline import recreate_finalized_timeline
 #from Basic_Edit_Job.supporting_edit_tasks.detect_silences import detect_silences_in_media
 
 def execute_basic_edit_part_1(edit_configurations, resolve):
@@ -72,9 +73,8 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve):
 
         remove_silences = edit_configurations["silence_removal"]
         pacing = edit_configurations["pacing_choice"]
-        print(timelineState.audio_tracks)
         print(silence_timestamps)
-        if remove_silences:
+        if remove_silences == 'true':
             match pacing:
                 case "calm":
                     # 1 second of silence in each silence timestamp is preserved
@@ -90,10 +90,19 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve):
             print(final_silence_timestamps)
 
             #add markers to the finalized timestamps
-            timelineState.add_markers_to_timestamps(final_silence_timestamps)
+            #timelineState.add_markers_to_timestamps(final_silence_timestamps)
 
-            # Find a way to cut footage between teh start and stop timestamps
+            # Function to create new timeline with silences deleted based on silence timestamps
+            new_timeline = recreate_finalized_timeline(mediaPool, timelineState, final_silence_timestamps)
 
+            # new timeline with silences trimmed off
+            new_timelineState = TimelineState(new_timeline)
+
+            print(timelineState.audio_tracks)
+            print(new_timelineState.audio_tracks)
+
+        # At this point, we've handled silence removal and the pacing option for the video
+        # Now, we need to focus on Zoom Cuts and Transitions, adding captions and brightness
         return "success", "Completed Basic Edit", {}
     except Exception as e:
         # This block will catch any exception and return them to the socket

@@ -39,7 +39,7 @@ def adapt_timestamps_to_pacing(silence_timestamps, pacing_choice):
                     # if the silence is very short, then the adjustment causes the
                     # end to occur before the start. In this case, we keep the entire
                     # silence
-                    if pair[0] > pair[1]:
+                    if pair[0] >= pair[1]:
                         del timestamps[pair_index]
     return silence_timestamps
 
