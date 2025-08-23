@@ -18,7 +18,13 @@ pub fn get_silence_timestamps_in_python(wav_files_dict: HashMap<usize, Vec<Strin
         .parent().unwrap() // /target/
         .parent().unwrap(); // src-tauri
 
+/* THIS IS SUPER BAD. THE PYTHON file path is within the local directory rather
+    than the put on the user's file system via post instal SCRIPT
+    
+            THIS NEEDS TO BE FIXED VERY SOON
+    */
     // Path to the Python file relative to project root
+    
     let py_path = project_root.join("python").join("dist").join("get_silence_timestamps").join("get_silence_timestamps");
     println!("python file path: {}", py_path.display());
 

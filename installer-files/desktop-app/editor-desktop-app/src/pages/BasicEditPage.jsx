@@ -274,7 +274,7 @@ function BasicEditPage({navigate}) {
                     use_cuts_and_transitions: useCutsAndTransitions,
                     silence_removal: silenceRemoval,
                     add_captions: addCaptions,
-                    auto_color: addSoundEffects,
+                    add_sound_effects: addSoundEffects,
                 };
                 invoke("Edit_Basic_Video", {configurations: configurations});
             }}>EDIT!!</Button>

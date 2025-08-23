@@ -2,6 +2,7 @@ from Basic_Edit_Job.supporting_edit_tasks.add_media_to_new_timeline import addMe
 from Basic_Edit_Job.supporting_edit_tasks.timelineState import TimelineState
 from Basic_Edit_Job.supporting_edit_tasks.adapt_timestamps_to_pacing import adapt_timestamps_to_pacing
 from Basic_Edit_Job.supporting_edit_tasks.recreate_finalized_timeline import recreate_finalized_timeline
+from Basic_Edit_Job.supporting_edit_tasks.add_magiczoom_to_timestamps import determine_magic_zoom_timestamps
 #from Basic_Edit_Job.supporting_edit_tasks.detect_silences import detect_silences_in_media
 
 def execute_basic_edit_part_1(edit_configurations, resolve):
@@ -57,7 +58,7 @@ def execute_basic_edit_part_1(edit_configurations, resolve):
         # GUI - script connection entirely
         return "failure", f"An error occurred: {type(e).__name__} - {e}", {}
     
-def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve):
+def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve, fusion):
 
     try:
         # create the necessary objects to pass to support functions
@@ -103,6 +104,14 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve):
 
         # At this point, we've handled silence removal and the pacing option for the video
         # Now, we need to focus on Zoom Cuts and Transitions, adding captions and brightness
+
+        #Procedure for adding all zoom cut based on pacing
+        # The function randomly adds magic zoom animations at a rate of 1 every x seconds based on the pacing
+        # In the future, we need a method to do a great job of deermining when to implement the zoom in
+        print("START OF PROCESS")
+        determine_magic_zoom_timestamps(new_timelineState, pacing, resolve, fusion)
+        print("End of Process")
+
         return "success", "Completed Basic Edit", {}
     except Exception as e:
         # This block will catch any exception and return them to the socket

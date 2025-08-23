@@ -4,12 +4,16 @@ import cv2
 # Note, the audio is not preserved which needs to be worked out. 
 def format_time(seconds):
     """Helper function to convert seconds to M:SS format"""
-    mins = int(seconds) // 60
+    hours = int(seconds) // 3600
+    minutes = (int(seconds) % 3600) // 60
     secs = int(seconds) % 60
-    return f"{mins}:{secs:02d}"
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
 
 def get_label_from_filename(filename):
-    """Extract label from 6th character of filename"""
+    """ 
+        Extract label from 6th character of filename
+        USED FOR THE IN GAME VS NOT in GAME Classification
+    """
     base = os.path.basename(filename)
     if len(base) >= 6 and base[5].isdigit():
         digit = int(base[5])
@@ -19,6 +23,14 @@ def get_label_from_filename(filename):
             return "not_in_game"
     return "unknown"
 
+def get_label_from_filename_game_classification(filename):
+    """
+        Extract Label for the game name.
+        Used in game classification task
+    """
+    base = os.path.basename(filename)
+    label = base[:-4]
+    return label
 
 def preprocess_raw_clips(clip_duration, frame_increment, raw_footage_folder, to_grayscale, resize_dims=(224, 224)):
     """
@@ -49,8 +61,9 @@ def preprocess_raw_clips(clip_duration, frame_increment, raw_footage_folder, to_
         step = frame_increment + 1
 
         base_name = os.path.splitext(file)[0]
-        label = get_label_from_filename(base_name)
-
+        
+        label = get_label_from_filename_game_classification(base_name)
+        print(f"file: {file}\n base_name: {base_name} \n Label: {label}")
         clip_idx = 0
         current_frame = 0
 
@@ -79,8 +92,8 @@ def preprocess_raw_clips(clip_duration, frame_increment, raw_footage_folder, to_
             start_str = format_time(start_sec)
             end_str = format_time(end_sec)
 
-            clip_name = f"{label}_{base_name}_{start_str}-{end_str}.mp4"
-            out_dir = os.path.join(raw_footage_folder, "processed")
+            clip_name = f"{label}_{start_str}-{end_str}.mp4"
+            out_dir = os.path.join(raw_footage_folder, "processed", "train")
             os.makedirs(out_dir, exist_ok=True)
             out_path = os.path.join(out_dir, clip_name)
 
@@ -96,4 +109,4 @@ def preprocess_raw_clips(clip_duration, frame_increment, raw_footage_folder, to_
 
         cap.release()
 
-preprocess_raw_clips(5, 0, "/Volumes/My Passport for Mac/Coding Projects/AI-Video-Editor-Da-Vinci/AI_tools/data/fortnite/raw_footage", True)
+preprocess_raw_clips(30, 0, "/Users/riyush/Documents/AI-Video-Editor-Da-Vinci/AI_tools/Determining the game being played/data/raw_videos", False)
