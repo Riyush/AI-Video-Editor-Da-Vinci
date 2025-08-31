@@ -10,12 +10,10 @@ import { GlobalContext } from "../page_hub/GlobalContext";
 function CheckoutWaitingPage({navigate}) {
     const { stripeSessionId, userId } = useContext(GlobalContext);
     useEffect(() => {
-    
         if (stripeSessionId && userId) {
           (async () => {
             try {
               const customerIDSuccessfulTransaction = await pollPaymentStatus(stripeSessionId);
-    
               if (customerIDSuccessfulTransaction) {
                 const userRef = doc(db, 'users', userId);
     
