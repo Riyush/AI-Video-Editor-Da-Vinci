@@ -34,8 +34,8 @@ script.pkg
 <---- Now create the .pkg file for the GUIAPP file by targeting GameTime.app------>
 <-- NOTE: we simply put the 
 
-pkgbuild --root installer-files/desktop-app/editor-desktop-app/src-tauri/target/release/bundle/macos \
---install-location "/Applications" \
+pkgbuild --root installer-files/desktop-app/editor-desktop-app/src-tauri/target/release/bundle/macos/GameTime.app \
+--install-location "/Applications/GameTime.app" \
 --identifier com.gametime.guiapp \
 --version 1.0 \
 --ownership recommended \
