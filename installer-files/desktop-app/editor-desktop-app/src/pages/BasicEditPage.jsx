@@ -129,8 +129,8 @@ function BasicEditPage({navigate}) {
                     ml={6}
                     w="80px"
                     h="50px"
-                    colorScheme={pacingChoice === 'fast' ? 'green' : 'orange'}
-                    variant={pacingChoice === 'fast' ? 'solid' : 'outline'}
+                    colorScheme={pacingChoice === 'Fast' ? 'green' : 'orange'}
+                    variant={pacingChoice === 'Fast' ? 'solid' : 'outline'}
                     onClick={() => {
                         setPacingChoice('Fast')
                     }}>Fast</Button>

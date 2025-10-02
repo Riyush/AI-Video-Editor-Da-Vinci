@@ -3,15 +3,20 @@ use std::process::{Command, Stdio};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::error::Error;
+use serde_json::Value;
+use serde_json;
+use std::os::unix::net::UnixStream;
 
-pub fn get_silence_timestamps_in_python(wav_files_dict: HashMap<usize, Vec<String>>) -> Result<HashMap<usize, HashMap<String, Vec<[f32; 2]>>>, Box<dyn std::error::Error>> {
+use crate::script_communication::send_socket_message::send_message_via_socket;
+
+pub fn get_silence_timestamps_in_python(wav_files_dict: HashMap<usize, Vec<String>>, stream: &mut UnixStream) -> Result<HashMap<usize, HashMap<String, Vec<[f32; 2]>>>, Box<dyn std::error::Error>> {
     /* 
     Note the return type is a map where the key is the track and value is another hashmap
     mapping each wav file path String to a list of timestamps representing silences
     
      */
     // Get path to the production python interpreter
-    let python_interpreter = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3");
+    let python_interpreter = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3.12");
     
     // Get path to create_wav_files script in production environment
     let py_path = PathBuf::from("/Library/Application Support/GameTime/main_logic/Basic_Edit_Job/supporting_edit_tasks/get_silence_timestamps.py");
@@ -51,10 +56,11 @@ pub fn get_silence_timestamps_in_python(wav_files_dict: HashMap<usize, Vec<Strin
         Ok(timestamps_dict)
         
     } else {
-        Err(format!(
-            "Python error: {}",
-            String::from_utf8_lossy(&output.stderr)
-        )
-        .into())
+        let stderr_str = String::from_utf8_lossy(&output.stderr).to_string();
+        let mut parameters: HashMap<String, i32> = HashMap::new();
+        let serialized_payload: Value = serde_json::to_value(parameters).unwrap();
+    
+        send_message_via_socket(stream, stderr_str, serialized_payload);
+        Err(format!("Python error: ").into())
     }
 }

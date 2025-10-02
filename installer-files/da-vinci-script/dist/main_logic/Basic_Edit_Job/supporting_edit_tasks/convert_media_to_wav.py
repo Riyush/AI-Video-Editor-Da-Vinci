@@ -2,6 +2,7 @@ import sys
 import json
 import os
 import subprocess
+import imageio_ffmpeg as ffmpeg
 
 def convert_media_to_wav_files(audio_file_paths_dict, output_dir = None, sample_rate = 44100):
     if output_dir is None:
@@ -19,7 +20,7 @@ def convert_media_to_wav_files(audio_file_paths_dict, output_dir = None, sample_
             wav_file = os.path.join(output_dir, f"{base_name}.wav")
             # Convert using ffmpeg
             command = [
-                    'ffmpeg',
+                    ffmpeg.get_ffmpeg_exe(),
                     '-i', media_file,
                     '-vn',                   # no video
                     '-acodec', 'pcm_s16le',  # standard uncompressed WAV

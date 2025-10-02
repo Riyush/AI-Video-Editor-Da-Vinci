@@ -4,18 +4,26 @@ import random
 def convert_frame_to_timecode(frame_num, fps):
     """Convert absolute frame number to a timecode string HH:MM:SS:FF"""
 
+    fps = int(fps)
+    frame_num = int(frame_num)
+
     frames_in_an_hour = 60 * 60 * fps
     hours = frame_num // frames_in_an_hour
-    remaining_frames = frame_num % frames_in_an_hour
+    remaining_frames = int(frame_num % frames_in_an_hour)
 
     frames_in_a_min = 60 * fps
     mins = remaining_frames // frames_in_a_min
-    remaining_frames = remaining_frames % frames_in_a_min
+    remaining_frames = int(remaining_frames % frames_in_a_min)
 
     frames_in_a_sec = fps
     secs = remaining_frames // frames_in_a_sec
-    frames = remaining_frames % frames_in_a_sec
+    frames = int(remaining_frames % frames_in_a_sec)
 
+    # Cast to int right before formatting, in case anything is still float
+    hours = int(hours)
+    mins = int(mins)
+    secs = int(secs)
+    frames = int(frames)
     return f"{hours:02}:{mins:02}:{secs:02}:{frames:02}"
 
 
@@ -39,7 +47,9 @@ def get_cut_frames(timelineState):
 
         cut_timecodes_dict[trackindex] = breaks
 
-def implement_magic_zoom_in_at_timestamp(timeline, resolve, fusion, start_frame, fps, is_zoom_in):
+        return cut_timecodes_dict
+
+def implement_magic_zoom_in_at_timestamp(timeline, resolve, fusion, start_frame, fps, is_zoom_in = True):
     """
     Function to implement a magic zoom in or zoom out at a specific start frame on the timeline
 
@@ -58,6 +68,10 @@ def implement_magic_zoom_in_at_timestamp(timeline, resolve, fusion, start_frame,
 
     #Get to the start frame where we want to implement the magic zoom on the timeline
     start_timecode = convert_frame_to_timecode(start_frame, fps)
+    if is_zoom_in:
+        print(f"IN Timecode that we move to: {start_timecode}")
+    else:
+        print(f"OUT  Timecode that we move to: {start_timecode}")
     timeline.SetCurrentTimecode(start_timecode)
 
     #Get the composition frame rate, composition object, and enter the fusion page
@@ -146,11 +160,11 @@ def determine_magic_zoom_timestamps(timelineState, pacing, resolve, fusion):
     # calm pace = 1 zoom roughly every 30 second interval
     match pacing:
         case "calm":
-            interval = 10
-        case "normal":
             interval = 20
+        case "normal":
+            interval = 10
         case "Fast":
-            interval = 30
+            interval = 3
 
     # Get timeline start and end time in secs
     timeline_end_frame = timelineState.timeline.GetEndFrame()
@@ -160,8 +174,8 @@ def determine_magic_zoom_timestamps(timelineState, pacing, resolve, fusion):
 
     #initialize the start of the timeline as the first zoom in candidate
     current_interval_start = timeline_start_frame
-    cuts_in_first_track = cut_timecodes_dict[1]
-    nearest_upcoming_cut_index = 0
+    cuts_in_first_track = cut_timecodes_dict[1] # This is a list of frames where cuts occur
+    nearest_upcoming_cut_index = 0      #index for the nearest cut on the right of the current candidate
     retries = 0     # when a candidate fails, try 3 more times max, if not, move to next interval
 
     END_Flag = False #when, a candidate frame becomes outside the timeline, we trigger the end flag
@@ -175,12 +189,14 @@ def determine_magic_zoom_timestamps(timelineState, pacing, resolve, fusion):
             current_interval_start += (interval * fps)
             retries = 0
 
-        #Determine a zoom in point
-        start_of_zoom_in_candidate = random.random.uniform(current_interval_start, current_interval_start + (interval * fps))
+        #Determine a zoom in point, we select a zoom in point from a 15 second range (heuristic choice) starting from current_interval_start
+        # Note that current interval start got moved in the previous iteration of this while loop after creating the previous magic zoom
+        start_of_zoom_in_candidate = random.uniform(current_interval_start, current_interval_start + (15 * fps))
         # Steps to check if zoom in candidate is too close to the nearest cut
-
+        print(f"Candidate Timecode for start of zoom in: {convert_frame_to_timecode(start_of_zoom_in_candidate, fps)}")
         
         # first, move the cut index to ensure the nearest cut is to the right of the candidate
+        nearest_upcoming_cut_index = 0
         while start_of_zoom_in_candidate > cuts_in_first_track[nearest_upcoming_cut_index]:
             nearest_upcoming_cut_index += 1
             if nearest_upcoming_cut_index >= len(cuts_in_first_track):
@@ -195,21 +211,28 @@ def determine_magic_zoom_timestamps(timelineState, pacing, resolve, fusion):
         # Note, cuts_in_first_track_contains the last frame of the timeline, so it never exceeds max frame
 
         # Check that the candidate frame isn't too close to a cut making a magic zoom impossible
-        if start_of_zoom_in_candidate + (1.5 * fps) > cuts_in_first_track[nearest_upcoming_cut_index]:
+        # We check to make sure the next cut is at least for seconds after the zoom in candidate
+        # because we want to reserve 1 second for zoom in animation, 2 seconds zoomed in, and 1 second to zoom out
+        print(f"Timecode of next cut: {convert_frame_to_timecode(cuts_in_first_track[nearest_upcoming_cut_index], fps)}")
+        if start_of_zoom_in_candidate + (4 * fps) > cuts_in_first_track[nearest_upcoming_cut_index]:
+            print("RETRY!!")
             retries +=1
             continue
 
         # Now, we know our candidate is a valid zoom in start point
         # Implement the zoom in at this point
-        implement_magic_zoom_in_at_timestamp(timelineState.timeline, resolve, fusion, start_of_zoom_in_candidate, fps, True)
+        implement_magic_zoom_in_at_timestamp(timelineState.timeline, resolve, fusion, start_of_zoom_in_candidate, fps, is_zoom_in = True)
+        resolve.OpenPage("cut")
 
-        #Now, we need to determine a magic zoom out point after the zoom in
-
-        #Implement the magic zoom out at the determined magic zoom outstart point, 
-        #note this zoom out could occur on a new timeline item within a new composition
+        # Now, we need to determine a zoom out point after the zoom in
+        # the zoom in takes 1 second and we want to hold the zoom in for 2 seconds
+        # We've already checked that the zoom out won't occur after a cut
+        start_of_zoom_out_candidate = start_of_zoom_in_candidate + (3 * fps)
+        implement_magic_zoom_in_at_timestamp(timelineState.timeline, resolve, fusion, start_of_zoom_out_candidate, fps, is_zoom_in = False)
+        resolve.OpenPage("cut")
 
         #Finally move the current interval starting point to the right for the next magic zoom
-        # Note, the start point should be start of zoom out + 1.5 secs + (0.5 * interval)
+        # We add the interval value to the end of the zoom out point to create enough seperation for the next magic zoom
 
-        #placeholder for testing
-        current_interval_start += (interval * fps)
+        current_interval_start = start_of_zoom_out_candidate + (interval * fps)
+        print(f"New Current interval start: {convert_frame_to_timecode(current_interval_start, fps)}")
