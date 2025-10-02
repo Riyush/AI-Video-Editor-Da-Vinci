@@ -9,8 +9,8 @@ from GUI_Communication.open_GUI import launch_GUI
 
 #mediaPool = projectManager.GetCurrentProject().GetMediaPool()
 #timeline = project.GetCurrentTimeline()
-def run_tool(resolve):
+def run_tool(resolve, fusion):
     socket, path_location = setup_socket()     # Setup the unix socket for GUI to connect to
     #launch_GUI()                # This needs to be fixed to point to new GUI
-    listen_for_requests(socket, path_location, resolve)
+    listen_for_requests(socket, path_location, resolve, fusion)
     

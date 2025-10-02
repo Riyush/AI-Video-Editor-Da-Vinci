@@ -1,20 +1,21 @@
 use std::collections::HashMap;
 use std::process::{Command, Stdio};
 use std::io::{self, Write};
-use std::fs;
-use std::env;
 use std::path::{Path, PathBuf};
+use std::error::Error;
+use serde_json::Value;
+use serde_json;
+use std::os::unix::net::UnixStream;
 
-pub fn create_wav_files_using_python(paths_dict: HashMap<usize, Vec<String>>) -> Result<String, Box<dyn std::error::Error>> {
-    // Get path to current executable
-    let exe_path = env::current_exe()?;
-    let project_root = exe_path
-        .parent().unwrap() // /target/debug/
-        .parent().unwrap() // /target/
-        .parent().unwrap(); // src-tauri
+use crate::script_communication::send_socket_message::send_message_via_socket;
 
-    // Path to the Python file relative to project root
-    let py_path = project_root.join("python").join("convert_media_to_wav.py");
+pub fn create_wav_files_using_python(paths_dict: HashMap<usize, Vec<String>>, stream: &mut UnixStream) -> Result<String, Box<dyn Error>> {
+    // Get path to the production python interpreter
+    let python_interpreter = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3.12");
+    
+    // Get path to create_wav_files script in production environment
+    let py_path = PathBuf::from("/Library/Application Support/GameTime/main_logic/Basic_Edit_Job/supporting_edit_tasks/convert_media_to_wav.py");
+
     println!("python file path: {}", py_path.display());
 
     if !py_path.exists() {
@@ -25,15 +26,20 @@ pub fn create_wav_files_using_python(paths_dict: HashMap<usize, Vec<String>>) ->
     println!("Paths as str: {}", paths_str);
 
     // spawn a child process to execute the python function to get .wav files
-    let mut child = Command::new("python3")
-    .arg(py_path)
+    // use the python interpreter installed on the user's system.
+    let mut child = Command::new(python_interpreter)
+    .arg(&py_path)
     .stdin(Stdio::piped())
     .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
     .spawn()?;
 
+    {
     // give the child process the paths dictionary to parse
-    child.stdin.as_mut().unwrap().write_all(paths_str.as_bytes())?;
-
+    let stdin = child.stdin.as_mut().ok_or("Failed to open stdin")?;
+    stdin.write_all(paths_str.as_bytes())?;
+    }
+    
     let output = child.wait_with_output()?;
 
     if output.status.success() {
@@ -45,11 +51,14 @@ pub fn create_wav_files_using_python(paths_dict: HashMap<usize, Vec<String>>) ->
         // function to create the silence timestamps
         Ok(stdout_str)
     } else {
-        Err(format!(
-            "Python error: {}",
-            String::from_utf8_lossy(&output.stderr)
-        )
-        .into())
+        let stderr_str = String::from_utf8_lossy(&output.stderr).to_string();
+        println!("Python script output:\n{}", stderr_str);
+        let mut parameters: HashMap<String, i32> = HashMap::new();
+        let serialized_payload: Value = serde_json::to_value(parameters).unwrap();
+    
+        send_message_via_socket(stream, stderr_str, serialized_payload);
+
+        Err(format!("Python error: ").into())
     }
 }
 

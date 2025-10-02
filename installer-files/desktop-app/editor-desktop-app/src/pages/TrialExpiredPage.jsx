@@ -30,7 +30,7 @@ function TrialExpiredPage({navigate}) {
         justify="center"
         mt={10}>
             <RedirectPageButton
-            DisplayText="Purchase $10/month subscription"
+            DisplayText="Purchase $14/month subscription"
             navigate={navigate}
             page="checkout-waiting"></RedirectPageButton>
         </Flex>

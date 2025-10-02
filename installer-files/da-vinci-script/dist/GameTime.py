@@ -17,9 +17,10 @@ from script import run_tool
 
 # Get the DaVinci Resolve scripting object
 resolve = resolve
+fusion = fusion
 
 # Run main logic which is in Application Support
 # We can easily interface with resolve using the resolve object when needed
 if __name__ == "__main__":
-    run_tool(resolve)
+    run_tool(resolve, fusion)
     

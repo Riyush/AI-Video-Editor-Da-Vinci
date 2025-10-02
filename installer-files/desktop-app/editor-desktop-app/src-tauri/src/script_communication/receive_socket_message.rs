@@ -51,11 +51,11 @@ pub fn socket_response_handler(response: String, app: AppHandle, stream: &mut Un
                                                 println!("Media File Paths: {:#?}", paths_hashmap);
                                                 // Here, I need to pass the parsed_paths dict to a function that creates the wav files,
                                                 // and gets silence timestamps 
-                                                let json_str = create_wav_files_using_python(paths_hashmap).unwrap(); // String
+                                                let json_str = create_wav_files_using_python(paths_hashmap, stream).unwrap(); // String
                                                 let wav_paths: HashMap<usize, Vec<String>> = serde_json::from_str(&json_str).unwrap();
                                                 
                                                 // Now get silences timestamps
-                                                let silence_timestamps_map= get_silence_timestamps_in_python(wav_paths).unwrap();
+                                                let silence_timestamps_map= get_silence_timestamps_in_python(wav_paths, stream).unwrap();
 
                                                 print_type_of(&silence_timestamps_map);
                                                 

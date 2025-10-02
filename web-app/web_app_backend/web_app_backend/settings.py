@@ -129,12 +129,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+env_path = BASE_DIR / '.env'  # Adjust as needed
 
-IN_DEVELOPMENT = os.environ.get('InDevelopment') == "True"
-
-env_path = Path(__file__).resolve().parent.parent / '.env'  # Adjust as needed
-
-load_dotenv()  # Only for local dev
+load_dotenv(env_path)  # Only for local dev
 
 # Variable to differentiate production vs developement , depends on env variable
 IN_DEVELOPMENT = os.getenv("InDevelopment")

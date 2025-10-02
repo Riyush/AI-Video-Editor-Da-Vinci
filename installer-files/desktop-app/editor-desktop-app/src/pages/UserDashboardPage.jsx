@@ -71,7 +71,7 @@ function UserDashboardPage({navigate}) {
                 bgGradient="linear(to-b, white, cyan.200)"
                 bgClip="text"
                 >
-                {remainingDays} Days Remaining
+                {remainingDays} Days Remaining in Your Trial
                 </Text>
             </VStack>
             )}

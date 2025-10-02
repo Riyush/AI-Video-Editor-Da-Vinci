@@ -1,6 +1,6 @@
 from Basic_Edit_Job.high_level_edit_function import execute_basic_edit_part_1, execute_basic_edit_part_2
 
-def message_handler(data, resolve, state_dict):
+def message_handler(data, resolve, fusion, state_dict):
     """This function receives the json data from the socket, evaluates the 
         'type' key and does some behavior to handle the message.
         Becuase all messages are standardized to json, this function exploits that
@@ -46,7 +46,7 @@ def message_handler(data, resolve, state_dict):
             silence_timestamps = data["params"]
             configurations = state_dict["configurations"]
             
-            response_status, response_message, payload = execute_basic_edit_part_2(configurations, silence_timestamps, resolve)
+            response_status, response_message, payload = execute_basic_edit_part_2(configurations, silence_timestamps, resolve, fusion)
 
             response = {}
             response["type"] = "Completed_Edit_Job"

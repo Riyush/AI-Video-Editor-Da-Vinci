@@ -11,7 +11,6 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 Price_ID = settings.PRICE_ID
 
-print(settings.IN_DEVELOPMENT)
 if settings.IN_DEVELOPMENT:
     success_url = 'http://localhost:8000/success'
     cancel_url = 'http://localhost:1420/cancel'
@@ -32,12 +31,9 @@ def create_checkout_session(request):
 
         # Create new customer
         customer = stripe.Customer.create(email=email)
-        #Set 30 minute expiration of checkout
-        expires_at = expires_at = int((datetime.datetime.utcnow() + datetime.timedelta(minutes=30)).timestamp())
-
+        print("Made it")
         session = stripe.checkout.Session.create(
             customer = customer.id,
-            payment_method_types=['card',],
             line_items=[{
                 'price': Price_ID,
                 'quantity': 1,
@@ -45,14 +41,12 @@ def create_checkout_session(request):
             mode='subscription',
             success_url=success_url,
             cancel_url=cancel_url,
-            subscription_data={
-                'trial_period_days': 14
-            },
-            expires_at=expires_at
         )
         print(session.url)
+
         return JsonResponse({'session_url': session.url, 'session_id':session.id})
     except Exception as e:
+        print("Stripe error:", str(e))
         return JsonResponse({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 

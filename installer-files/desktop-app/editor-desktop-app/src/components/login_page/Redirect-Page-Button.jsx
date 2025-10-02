@@ -23,7 +23,7 @@ function RedirectPageButton( {DisplayText, navigate, page}) {
             console.error("Failed to expire checkout session:", error);
           }
         }
-        if (DisplayText === "Purchase $10/month subscription") {
+        if (DisplayText === "Purchase $14/month subscription") {
           // prepare to create a checkout session by getting user Data and email.
           const userData = await retrieveUserDetails(userId);
 

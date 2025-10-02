@@ -22,7 +22,7 @@ function BasicEditPage({navigate}) {
     // Add Captions
     const [addCaptions, setAddCaptions] = useState(null);
     // AutoColor Option
-    const [autoColor, setAutoColor] = useState(null);
+    const [addSoundEffects, setAddSoundEffects] = useState(null);
     // useEffect that simply prints all state variables to be sent to script
     useEffect(() => {
         console.log("already added to timeline", addedToTimeline);
@@ -31,8 +31,8 @@ function BasicEditPage({navigate}) {
         console.log("Use Cuts and Transitions:", useCutsAndTransitions);
         console.log("Silence Removal:", silenceRemoval);
         console.log("Add Captions:", addCaptions);
-        console.log("AutoColor:", autoColor);
-    }, [addedToTimeline, clipFolderPath, pacingChoice, useCutsAndTransitions, addCaptions, silenceRemoval, autoColor]);
+        console.log("addSoundEffects:", addSoundEffects);
+    }, [addedToTimeline, clipFolderPath, pacingChoice, useCutsAndTransitions, addCaptions, silenceRemoval, addSoundEffects]);
     return (
         <Box
         minH="100vh" // full height of screen
@@ -129,8 +129,8 @@ function BasicEditPage({navigate}) {
                     ml={6}
                     w="80px"
                     h="50px"
-                    colorScheme={pacingChoice === 'fast' ? 'green' : 'orange'}
-                    variant={pacingChoice === 'fast' ? 'solid' : 'outline'}
+                    colorScheme={pacingChoice === 'Fast' ? 'green' : 'orange'}
+                    variant={pacingChoice === 'Fast' ? 'solid' : 'outline'}
                     onClick={() => {
                         setPacingChoice('Fast')
                     }}>Fast</Button>
@@ -197,22 +197,31 @@ function BasicEditPage({navigate}) {
                 >Add Captions?</Text>
                 <Button
                     ml={7}
-                    w="80px"
+                    w="110px"
                     h="50px"
-                    colorScheme={addCaptions === true ? 'green' : 'orange'}
-                    variant={addCaptions === true ? 'solid' : 'outline'}
+                    colorScheme={addCaptions === "All Dialogue" ? 'green' : 'orange'}
+                    variant={addCaptions === "All Dialogue" ? 'solid' : 'outline'}
                     onClick={() =>{
-                        setAddCaptions(true)
-                    }}>Yes</Button>
+                        setAddCaptions("All Dialogue")
+                    }}>All Dialogue</Button>
+                    <Button
+                    ml={6}
+                    w="120px"
+                    h="50px"
+                    colorScheme={addCaptions === "Key Moments" ? 'green' : 'orange'}
+                    variant={addCaptions === "Key Moments" ? 'solid' : 'outline'}
+                    onClick={() => {
+                        setAddCaptions("Key Moments")
+                    }}>Key Moments</Button>
                     <Button
                     ml={6}
                     w="80px"
                     h="50px"
-                    colorScheme={addCaptions === false ? 'green' : 'orange'}
-                    variant={addCaptions === false ? 'solid' : 'outline'}
+                    colorScheme={addCaptions === "None" ? 'green' : 'orange'}
+                    variant={addCaptions === "None" ? 'solid' : 'outline'}
                     onClick={() => {
-                        setAddCaptions(false)
-                    }}>No</Button>
+                        setAddCaptions("None")
+                    }}>None</Button>
             </HStack>
             <HStack>
                 <Text
@@ -220,25 +229,34 @@ function BasicEditPage({navigate}) {
                 bgClip='text'
                 fontSize='2xl'
                 fontWeight='extrabold'
-                >Improve Brightness?</Text>
+                >Add Sound Effects?</Text>
                 <Button
                     ml={7}
-                    w="80px"
+                    w="110px"
                     h="50px"
-                    colorScheme={autoColor === true ? 'green' : 'orange'}
-                    variant={autoColor === true ? 'solid' : 'outline'}
+                    colorScheme={addSoundEffects === "Frequently" ? 'green' : 'orange'}
+                    variant={addSoundEffects === "Frequently" ? 'solid' : 'outline'}
                     onClick={() =>{
-                        setAutoColor(true)
-                    }}>Yes</Button>
+                        setAddSoundEffects("Frequently")
+                    }}>Frequently</Button>
+                    <Button
+                    ml={6}
+                    w="120px"
+                    h="50px"
+                    colorScheme={addSoundEffects === "Key Moments" ? 'green' : 'orange'}
+                    variant={addSoundEffects === "Key Moments" ? 'solid' : 'outline'}
+                    onClick={() => {
+                        setAddSoundEffects("Key Moments")
+                    }}>Key Moments</Button>
                     <Button
                     ml={6}
                     w="80px"
                     h="50px"
-                    colorScheme={autoColor === false ? 'green' : 'orange'}
-                    variant={autoColor === false ? 'solid' : 'outline'}
+                    colorScheme={addSoundEffects === "None" ? 'green' : 'orange'}
+                    variant={addSoundEffects === "None" ? 'solid' : 'outline'}
                     onClick={() => {
-                        setAutoColor(false)
-                    }}>No</Button>
+                        setAddSoundEffects("None")
+                    }}>None</Button>
             </HStack>
 
             <Button
@@ -256,7 +274,7 @@ function BasicEditPage({navigate}) {
                     use_cuts_and_transitions: useCutsAndTransitions,
                     silence_removal: silenceRemoval,
                     add_captions: addCaptions,
-                    auto_color: autoColor,
+                    add_sound_effects: addSoundEffects,
                 };
                 invoke("Edit_Basic_Video", {configurations: configurations});
             }}>EDIT!!</Button>
