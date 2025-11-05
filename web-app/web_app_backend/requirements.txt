@@ -1,0 +1,8 @@
+groq
+django
+corsheaders
+djangorestframework
+dotenv
+stripe
+requests
+tempfile

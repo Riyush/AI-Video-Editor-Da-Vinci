@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'billing',
     'rest_framework',
     "corsheaders",
+    'billing',
+    'audio_transcription',
 ]
 
 MIDDLEWARE = [
@@ -131,14 +132,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 env_path = BASE_DIR / '.env'  # Adjust as needed
 
-load_dotenv(env_path)  # Only for local dev
+#currently, I store env vars on a simple local file, in production, this setup won't work
+
+load_dotenv(env_path)  # Only for local dev, 
 
 # Variable to differentiate production vs developement , depends on env variable
 IN_DEVELOPMENT = os.getenv("InDevelopment")
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 PRICE_ID = os.getenv("Price_ID")
-
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GROQ_API_KEY = os.getenv("Groq_Transcription_API_KEY")
 
 # In development, the desktop app sends request via port 1420, but in production
 # the desktop app can send requests from other places depending on OS and configurations. 

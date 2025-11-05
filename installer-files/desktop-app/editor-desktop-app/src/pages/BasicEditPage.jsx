@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Box, Button, HStack, Text, VStack, Image } from "@chakra-ui/react";
 
 import { invoke } from '@tauri-apps/api/core';
+import { listen } from '@tauri-apps/api/event';
 
 import FolderPicker from "../components/dashboard/FolderPicker";
 import RedirectPageButton from "../components/login_page/Redirect-Page-Button";
@@ -21,18 +22,42 @@ function BasicEditPage({navigate}) {
     const [silenceRemoval, setSilenceRemoval] = useState(null);
     // Add Captions
     const [addCaptions, setAddCaptions] = useState(null);
+
     // AutoColor Option
     const [addSoundEffects, setAddSoundEffects] = useState(null);
+
+    //special variable for the number of audio tracks so that user can select which audio tracks to transcribe
+    const [audioTracksCount, setAudioTracksCount] = useState(null);
+
+    //array of int where each int represents a track to be transcribed, requires some processing
+    const [tracksToTranscribe, setTracksToTranscribe] = useState([]);
+    //special intermediate data structure for the tracks the user selects.
+    const [selectedTracks, setSelectedTracks] = useState(null);
     // useEffect that simply prints all state variables to be sent to script
     useEffect(() => {
-        console.log("already added to timeline", addedToTimeline);
-        console.log("Folder Path:", clipFolderPath);
-        console.log("Pacing Choice:", pacingChoice);
-        console.log("Use Cuts and Transitions:", useCutsAndTransitions);
-        console.log("Silence Removal:", silenceRemoval);
-        console.log("Add Captions:", addCaptions);
-        console.log("addSoundEffects:", addSoundEffects);
-    }, [addedToTimeline, clipFolderPath, pacingChoice, useCutsAndTransitions, addCaptions, silenceRemoval, addSoundEffects]);
+        //console.log("already added to timeline", addedToTimeline);
+        //console.log("Folder Path:", clipFolderPath);
+        //console.log("Pacing Choice:", pacingChoice);
+        //console.log("Use Cuts and Transitions:", useCutsAndTransitions);
+        //console.log("Silence Removal:", silenceRemoval);
+        //console.log("Add Captions:", addCaptions);
+        //console.log("addSoundEffects:", addSoundEffects);
+        console.log("audioTracksCount:", audioTracksCount);
+    }, [addedToTimeline, clipFolderPath, pacingChoice, useCutsAndTransitions, addCaptions, silenceRemoval, addSoundEffects, audioTracksCount]);
+
+    useEffect(() => {
+    const unlistenPromise = listen('audio-tracks-count', (event) => {
+      console.log('Received audio tracks:', event.payload);
+      if ('Audio_Track_Count' in event.payload) {
+        setAudioTracksCount(Number(event.payload.Audio_Track_Count));
+      }
+    });
+
+    return () => {
+      unlistenPromise.then((unlisten) => unlisten()); // cleanup listener
+    };
+    }, []);
+
     return (
         <Box
         minH="100vh" // full height of screen
@@ -203,6 +228,8 @@ function BasicEditPage({navigate}) {
                     variant={addCaptions === "All Dialogue" ? 'solid' : 'outline'}
                     onClick={() =>{
                         setAddCaptions("All Dialogue")
+                        // Get Number of Audio Tracks from the Script
+                        invoke("Get_Number_Of_Audio_Tracks");
                     }}>All Dialogue</Button>
                     <Button
                     ml={6}
@@ -212,6 +239,8 @@ function BasicEditPage({navigate}) {
                     variant={addCaptions === "Key Moments" ? 'solid' : 'outline'}
                     onClick={() => {
                         setAddCaptions("Key Moments")
+                        // Get Number of Audio Tracks from the Script
+                        invoke("Get_Number_Of_Audio_Tracks");
                     }}>Key Moments</Button>
                     <Button
                     ml={6}
@@ -223,6 +252,34 @@ function BasicEditPage({navigate}) {
                         setAddCaptions("None")
                     }}>None</Button>
             </HStack>
+            
+            {((addCaptions === "Key Moments" || addCaptions === "All Dialogue") && addedToTimeline === true) && (
+                // HStack block for users to select the timeline tracks they want to transcribe
+                <VStack>
+                    <Text
+                    bgGradient='linear(to-b, white, cyan.200)'
+                    bgClip='text'
+                    fontSize='2xl'
+                    fontWeight='extrabold'
+                    >Select an Audio Track to add captions to </Text>
+                    <HStack>
+                        {Array.from({ length: audioTracksCount }, (_, i) => {
+                        const trackNumber = i + 1;
+                        return (
+                        <Button
+                            key={i}
+                            colorScheme="cyan"
+                            variant={selectedTracks === trackNumber ? "solid" : "outline"}
+                            onClick={() => setSelectedTracks(trackNumber)}    // Only select one track
+                        >
+                            {`A${trackNumber}`}
+                        </Button>
+                        );
+                    })}
+                    </HStack>
+                </VStack>
+            )}
+            
             <HStack>
                 <Text
                 bgGradient='linear(to-b, white, cyan.200)'
@@ -267,6 +324,20 @@ function BasicEditPage({navigate}) {
             w="150px"
             colorScheme="teal"
             onClick={()=>{
+                // Logic to finalize audio track to transcribe
+                //Use a new local variable as to avoid asynchronous timing issues
+                let newTracksToTranscribe = [];
+
+                if (addCaptions === "None"){ //case where we transcribe no tracks
+                    newTracksToTranscribe = [];
+                }
+                else if (addedToTimeline === false) {   // case where we always transcribe track 1
+                    newTracksToTranscribe = [1];
+                }
+                else {  // case where we transcribe the selected track, can only be 1 track at this point 
+                    newTracksToTranscribe = [selectedTracks];
+                }
+
                 const configurations = {
                     added_to_timeline: addedToTimeline,
                     clip_folder_path: clipFolderPath,
@@ -274,8 +345,12 @@ function BasicEditPage({navigate}) {
                     use_cuts_and_transitions: useCutsAndTransitions,
                     silence_removal: silenceRemoval,
                     add_captions: addCaptions,
+                    tracks_to_transcribe: newTracksToTranscribe,
                     add_sound_effects: addSoundEffects,
                 };
+                //resync the global state variable with the local variable.
+                setTracksToTranscribe(newTracksToTranscribe);
+
                 invoke("Edit_Basic_Video", {configurations: configurations});
             }}>EDIT!!</Button>
             </VStack>

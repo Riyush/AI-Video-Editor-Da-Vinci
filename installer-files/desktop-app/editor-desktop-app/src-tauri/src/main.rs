@@ -35,7 +35,8 @@ fn main() {
         .manage(state)
         .invoke_handler(tauri::generate_handler![
             commands::GUI_Loaded,
-            commands::Edit_Basic_Video,])
+            commands::Edit_Basic_Video,
+            commands::Get_Number_Of_Audio_Tracks])
         .setup(move |app| {
             //move the receiver into setup_app
             setup_app(app, event_receiver)

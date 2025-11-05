@@ -45,6 +45,16 @@ pub fn send_global_message(app: AppHandle, command: &str, parameters: HashMap<St
             app.emit("prompt-user-to-run-socket-script", payload)
                 .unwrap();
         }
+        "Emit_Audio_Tracks_Count" => {
+            // In this case, parameters is a hashmap <String, String> with one key value pair
+            // That pair is "Audio_Track_Count" : "4"  - The javascript must convert this to int
+            // Check for frontend to be fully mounted
+            let app_clone = app.clone();
+            // Emit event to frontend
+            if let Err(err) = app_clone.emit("audio-tracks-count", parameters) {
+                eprintln!("Failed to emit audio-tracks-count event: {}", err);
+            }
+        }
         _ => {
             todo!() //default case
         }

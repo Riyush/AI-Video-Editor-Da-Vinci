@@ -21,4 +21,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/billing/', include('billing.urls')),
+    path('api/audio_transcription/', include('audio_transcription.urls')),
 ]

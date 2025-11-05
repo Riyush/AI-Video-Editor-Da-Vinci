@@ -5,6 +5,7 @@ Backend can receive. This ffile is linked in lib.rs
 
  */
 use crate::App_State::app_state::AppState;
+use crate::App_State::app_state::ThreadMessage;
 use std::io::Result;
 use std::collections::HashMap;
 use serde_json::Value;
@@ -25,12 +26,27 @@ pub fn Edit_Basic_Video(state: tauri::State<AppState>, configurations: HashMap<S
     println!("Received config: {:?}", configurations);
     let mut event_sender = state.event_sender.lock().unwrap();
 
-    print_type_of(&configurations);
 
-    // Convert HashMap<String, Value> into serde_json::Value::Object
-    let config_value = Value::Object(configurations.into_iter().collect());
+    // Convert HashMap<String, Value> Value::Object
+    let payload_as_value = Value::Object(configurations.into_iter().collect());
+    let message_str = "Basic-Edit-Job";
+    
+    let msg = ThreadMessage::new(message_str, payload_as_value);
 
-    if let Err(err) = event_sender.send(config_value) {
+    if let Err(err) = event_sender.send(msg) {
+        eprintln!("Failed to send to background thread: {err}");
+    }
+}
+
+// This command will get the number of audio tracks from the da vinci script
+#[tauri::command]
+pub fn Get_Number_Of_Audio_Tracks(state: tauri::State<AppState>){
+
+    let mut event_sender = state.event_sender.lock().unwrap();
+
+    let msg = ThreadMessage::simple("Get_Number_Of_Audio_Tracks");
+
+    if let Err(err) = event_sender.send(msg) {
         eprintln!("Failed to send to background thread: {err}");
     }
 }
