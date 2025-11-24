@@ -104,14 +104,14 @@ pub fn socket_response_handler(response: String, app: AppHandle, stream: &mut Un
 
                                 // ✅✅✅ now, we have the wav paths and we want to 
                                 // trigger a subprocess to get transcripts for that track
-                                let transcripts_string: String = get_audio_transcripts_in_python(wav_paths, stream).unwrap();
+                                let success_status: String = get_audio_transcripts_in_python(wav_paths, stream).unwrap();
 
-                                // Note, the transcripts_dict is a serialized string
-                                // We send the string back to the script and let python parse it back to a dictionary
-                                let serialized_transcripts:Value = serde_json::to_value(transcripts_string).unwrap();
+                                // Note, we save the transcripts to a txt file on the user's computer to avoid sending
+                                // lot's of text through the socket.
+                                let serialized_status:Value = serde_json::to_value(success_status).unwrap();
                                 let message_type: String = String::from("Basic-Edit-Part-3-Apply-Captions");
 
-                                send_message_via_socket(stream, message_type, serialized_transcripts);
+                                send_message_via_socket(stream, message_type, serialized_status);
                             } else {
                                 eprintln!("'wav_paths' is not an array");
                             }

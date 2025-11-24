@@ -1,5 +1,6 @@
-from Basic_Edit_Job.high_level_edit_function import execute_basic_edit_part_1, execute_basic_edit_part_2
+from Basic_Edit_Job.high_level_edit_function import execute_basic_edit_part_1, execute_basic_edit_part_2, execute_basic_edit_part_3
 from Basic_Edit_Job.supporting_edit_tasks.get_number_of_audio_tracks import get_audio_track_count
+from Basic_Edit_Job.supporting_edit_tasks.read_transcription_dict import read_transcriptions_dict
 
 import json
 
@@ -62,16 +63,23 @@ def message_handler(data, resolve, fusion, state_dict):
             response["status"] = response_status
             response["payload"] = {"message": response_message, "wav_paths": wav_paths_list}
 
-            print(response_type)
             # Need code here to delete the wav files in /Library/Application Support/GameTime/wav_files
         
         case "Basic-Edit-Part-3-Apply-Captions":
             
-            # Receive the dictionary mapping media base paths to their transcription dictionaries
-            # "5. It's_a_bitt_too_much : {}
-            merged_transcripts = json.loads(data["params"])
-
-            # Now I need to write the high level function that takes the transcripts and creates captions
+            #First, get the status message indicating if we successfully got the captions
+            got_captions = data["params"]
+            if got_captions == "success\n":
+                #Get the merged_transcriptions dictionary from the predetermined .txt file path
+                merged_transcriptions = read_transcriptions_dict()
+                # Now I need to write the high level function that takes the transcripts and creates captions
+                configurations = state_dict["configurations"]
+                response_status, response_message, payload = execute_basic_edit_part_3(configurations, merged_transcriptions, resolve, fusion)
+                
+                response = {}
+                response["type"] = "Final_Transitions"
+                response["status"] = response_status
+                response["payload"] = {"message": response_message}
 
         case "Get_Number_Of_Audio_Tracks":
            #Case for when the GUI wants to know how many audio tracks are on the timeline  

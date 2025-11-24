@@ -230,18 +230,7 @@ function BasicEditPage({navigate}) {
                         setAddCaptions("All Dialogue")
                         // Get Number of Audio Tracks from the Script
                         invoke("Get_Number_Of_Audio_Tracks");
-                    }}>All Dialogue</Button>
-                    <Button
-                    ml={6}
-                    w="120px"
-                    h="50px"
-                    colorScheme={addCaptions === "Key Moments" ? 'green' : 'orange'}
-                    variant={addCaptions === "Key Moments" ? 'solid' : 'outline'}
-                    onClick={() => {
-                        setAddCaptions("Key Moments")
-                        // Get Number of Audio Tracks from the Script
-                        invoke("Get_Number_Of_Audio_Tracks");
-                    }}>Key Moments</Button>
+                    }}>Yes</Button>
                     <Button
                     ml={6}
                     w="80px"

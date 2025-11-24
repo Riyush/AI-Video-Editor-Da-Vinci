@@ -7,11 +7,11 @@ import sys
 # main_logic which will have direct access to the Da Vinci Resolve objects.
 
 # This is the path to the main_logic directory on the user's computer
-logic_path = os.path.join("/Library", "Application Support", "GameTime", "main_logic")
+logic_path_MAC = os.path.join("/Library", "Application Support", "GameTime", "main_logic")
 
 # Add your tool's logic path to sys.path
-if logic_path not in sys.path:
-    sys.path.append(logic_path)
+if logic_path_MAC not in sys.path:
+    sys.path.append(logic_path_MAC)
 
 from script import run_tool
 

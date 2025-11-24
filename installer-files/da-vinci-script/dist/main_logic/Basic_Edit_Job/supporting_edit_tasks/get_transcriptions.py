@@ -15,10 +15,9 @@ TRANSCRIPTION_ENDPOINT = "http://127.0.0.1:8000/api/audio_transcription/transcri
 
 # PATHS FOR FILE MANIPULATION, need to change in windows version of application
 home_dir = os.path.expanduser("~")
-WAV_DIR = os.path.join(home_dir, "Library", "Application Support", "GameTime", "wav_files")
-CHUNKED_WAV_DIR = os.path.join(home_dir, "Library", "Application Support", "GameTime", "chunked_wav_files")
-TXT_DIR = os.path.join(home_dir, "Library", "Application Support", "GameTime", "transcripts")
-
+WAV_DIR_MAC = os.path.join(home_dir, "Library", "Application Support", "GameTime", "wav_files")
+CHUNKED_WAV_DIR_MAC = os.path.join(home_dir, "Library", "Application Support", "GameTime", "chunked_wav_files")
+TRANSCRIPTION_DIR_MAC = os.path.join(home_dir, "Library", "Application Support", "GameTime", "transcripts")
 def get_transcriptions():
     """
     This function returns a dictionary mapping each media pool item to a transcript dictionary
@@ -31,10 +30,10 @@ def get_transcriptions():
 
     try:
         # Get a list of all wav files to be transcribed
-        for wav_file_path in os.listdir(CHUNKED_WAV_DIR):
+        for wav_file_path in os.listdir(CHUNKED_WAV_DIR_MAC):
             #print(f"WAV file: {wav_file_path}")
             # Construct the full path to the entry
-            wav_path = os.path.join(CHUNKED_WAV_DIR, wav_file_path)
+            wav_path = os.path.join(CHUNKED_WAV_DIR_MAC, wav_file_path)
             #transcribe the wav file
             #Remember, the transcript_dict for one wav file is a complex dictionary
             # with file metadata and a mapping of transcript words to timestamps
@@ -52,7 +51,7 @@ def get_transcriptions():
         return transcriptions
 
     except Exception as e:
-        #print(f"Top-level error in get_transcriptions(): {e}")
+        print(f"Top-level error in get_transcriptions(): {e}")
         return None
 
 def transcribe_wav_file(wav_path):
@@ -169,7 +168,7 @@ def merge_all_transcriptions(transcriptions):
 
     return merged_transcriptions
 
-def split_wav_into_chunks(input_path, output_dir=CHUNKED_WAV_DIR, slice_length_ms=CHUNK_LENGTH_MS):
+def split_wav_into_chunks(input_path, output_dir=CHUNKED_WAV_DIR_MAC, slice_length_ms=CHUNK_LENGTH_MS):
     """
     Splits a .wav file specified by input_path into fixed-length slices and saves them with a
     naming pattern: <base>_Gametime_<index>.wav
@@ -226,8 +225,7 @@ def split_select_wav_files(wav_files_path_list):
     wav_files_path_list: list[str], each str is the absolute path to the wav file
     """
     # First, create Chunked Wav Dir if it doesn't exist
-    CHUNKED_WAV_DIR = os.path.join(home_dir, "Library", "Application Support", "GameTime", "chunked_wav_files")
-    os.makedirs(CHUNKED_WAV_DIR, exist_ok=True)
+    os.makedirs(CHUNKED_WAV_DIR_MAC, exist_ok=True)
 
     for file_path in wav_files_path_list:
         if file_path.lower().endswith(".wav"):
@@ -258,7 +256,19 @@ def validate_wav(path):
         }
     except Exception as e:
         return {"valid": False, "error": str(e)}
-    
+
+def save_transcripts_to_file(merged_transcriptions):
+    try:
+        os.makedirs(TRANSCRIPTION_DIR_MAC, exist_ok=True)
+        output_path = os.path.join(TRANSCRIPTION_DIR_MAC, "merged_transcriptions.json")
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(merged_transcriptions, f, indent=2) 
+        
+        print("success")
+    except Exception as e:
+        print(f" Failed to save transcripts: {e}")
+
+
 if __name__ == "__main__":
     #For now, create the wav files list
     # List all files (not folders) in the directory
@@ -272,6 +282,4 @@ if __name__ == "__main__":
     
     split_select_wav_files(wav_paths_list)
     merged_transcripts = get_transcriptions()
-
-    print(json.dumps(merged_transcripts))
-    
+    save_transcripts_to_file(merged_transcripts)

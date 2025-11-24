@@ -4,8 +4,10 @@ from Basic_Edit_Job.supporting_edit_tasks.adapt_timestamps_to_pacing import adap
 from Basic_Edit_Job.supporting_edit_tasks.recreate_finalized_timeline import recreate_finalized_timeline
 from Basic_Edit_Job.supporting_edit_tasks.add_magiczoom_to_timestamps import determine_magic_zoom_timestamps
 from Basic_Edit_Job.supporting_edit_tasks.get_audio_files_in_track import get_wav_files_for_track
+from Basic_Edit_Job.supporting_edit_tasks.add_captions import add_captions
 
 import json
+import traceback
 
 def execute_basic_edit_part_1(edit_configurations, resolve):
     try:
@@ -160,4 +162,41 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve, 
         return "failure", f"An error occurred: {type(e).__name__} - {e}", {}
 
 def execute_basic_edit_part_3(edit_configurations, transciptions_dict, resolve, fusion):
-    pass
+    if transciptions_dict == None:
+        #In this case, there are no captions to add 
+        # Need to have proper return statement for the socket to convey
+        return f"success", "No captions were added", {}
+
+    # At this point, we know we need to add captions for a specific track
+    try:
+        # create the necessary objects to pass to support functions
+        mediaStorage = resolve.GetMediaStorage()
+        proj_manager = resolve.GetProjectManager()
+        proj = proj_manager.GetCurrentProject()
+        mediaPool = proj.GetMediaPool()
+
+        timeline = proj.GetCurrentTimeline()
+        timelineState = TimelineState(timeline)
+
+
+        tracks= edit_configurations["tracks_to_transcribe"]
+        if isinstance(tracks, str):
+            tracks_list = json.loads(tracks)
+        else:
+            tracks_list = tracks
+        
+        track_to_transcribe = tracks_list[0]
+        print(track_to_transcribe)
+
+        #At this point, we know the user wants to add captions to the entirety of a specific track
+        add_captions(transciptions_dict, track_to_transcribe, timelineState, resolve, fusion)
+
+        return "success", "Completed Basic Edit", {}
+
+    except Exception as e:
+        # This block will catch any exception and return them to the socket
+        # This way, errors are caught and returned to the GUI rather than kill the 
+        # GUI - script connection entirely
+        #print("Error:", e)
+        #traceback.print_exc()
+        return "failure", f"An error occurred: {type(e).__name__} - {e}", {}

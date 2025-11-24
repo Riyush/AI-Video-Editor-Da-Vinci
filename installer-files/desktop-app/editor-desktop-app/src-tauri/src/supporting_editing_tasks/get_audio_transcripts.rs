@@ -11,15 +11,15 @@ use crate::script_communication::send_socket_message::send_message_via_socket;
 pub fn get_audio_transcripts_in_python(wav_paths_to_transcribe:Vec<String>, stream: &mut UnixStream) -> Result<String, Box<dyn Error>> {
 
     // Get path to the production python interpreter
-    let python_interpreter = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3.12");
+    let python_interpreter_MAC = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3.12");
     
     // Get path to get_transcripts script in production environment
-    let py_path = PathBuf::from("/Library/Application Support/GameTime/main_logic/Basic_Edit_Job/supporting_edit_tasks/get_transcriptions.py");
+    let py_path_MAC = PathBuf::from("/Library/Application Support/GameTime/main_logic/Basic_Edit_Job/supporting_edit_tasks/get_transcriptions.py");
 
-    println!("Python script path: {}", py_path.display());
+    println!("Python script path: {}", py_path_MAC.display());
 
-    if !py_path.exists() {
-        return Err(format!("Python script not found at: {}", py_path.display()).into());
+    if !py_path_MAC.exists() {
+        return Err(format!("Python script not found at: {}", py_path_MAC.display()).into());
     }
 
     // 3. Serialize paths list into JSON string
@@ -28,8 +28,8 @@ pub fn get_audio_transcripts_in_python(wav_paths_to_transcribe:Vec<String>, stre
     println!("Sending to Python: {}", wav_paths_json);
 
     // 4. Spawn Python process
-    let mut child = Command::new(python_interpreter)
-        .arg(&py_path)
+    let mut child = Command::new(python_interpreter_MAC)
+        .arg(&py_path_MAC)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
