@@ -4,12 +4,12 @@ import os
 import subprocess
 import imageio_ffmpeg as ffmpeg
 
-def convert_media_to_wav_files(audio_file_paths_dict, output_dir = None, sample_rate = 44100):
-    if output_dir is None:
+def convert_media_to_wav_files(audio_file_paths_dict, output_dir_MAC = None, sample_rate = 44100):
+    if output_dir_MAC is None:
         home_dir = os.path.expanduser("~")
-        output_dir = os.path.join(home_dir, "Library", "Application Support", "GameTime", "wav_files")
+        output_dir_MAC = os.path.join(home_dir, "Library", "Application Support", "GameTime", "wav_files")
 
-    os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(output_dir_MAC, exist_ok=True)
 
     wav_paths = {}
     for track, files in audio_file_paths_dict.items():
@@ -17,7 +17,7 @@ def convert_media_to_wav_files(audio_file_paths_dict, output_dir = None, sample_
         for media_file in files:
             #create output filename
             base_name = os.path.splitext(os.path.basename(media_file))[0]
-            wav_file = os.path.join(output_dir, f"{base_name}.wav")
+            wav_file = os.path.join(output_dir_MAC, f"{base_name}.wav")
             # Convert using ffmpeg
             command = [
                     ffmpeg.get_ffmpeg_exe(),

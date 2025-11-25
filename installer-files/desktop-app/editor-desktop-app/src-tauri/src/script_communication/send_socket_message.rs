@@ -32,6 +32,20 @@ pub fn send_message_via_socket(
             // this time params includes the dictionary of silence timestamps for 
             // each media clip on the track
         }
+        "Basic-Edit-Part-3-Apply-Captions" => {
+            serde_json::json!({
+                "type": message_type,
+                "params": parameters
+            })
+        }
+        "Get_Number_Of_Audio_Tracks" => {
+            serde_json::json!({
+                "type": message_type,
+                "params": parameters
+            })
+            // No real parameters to send, but we send the message type indicating that we
+            // want the number of audio tracks
+        }
         _ => {
             // Default handler for other message types
             serde_json::json!({

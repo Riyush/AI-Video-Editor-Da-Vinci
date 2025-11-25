@@ -36,15 +36,15 @@ def setup_socket():
 
 def record_socket_path(socket_path, pid):
     # Try to create record ipc_config file in Application Support
-    config_dir = "/Library/Application Support/GameTime"
-    if os.access(config_dir, os.W_OK):
-        config_path = os.path.join(config_dir, "ipc_config.json")
+    config_dir_MAC = "/Library/Application Support/GameTime"
+    if os.access(config_dir_MAC, os.W_OK):
+        config_path = os.path.join(config_dir_MAC, "ipc_config.json")
     # Instead create it in /tmp
     else:
-        config_dir = "/tmp"
-        config_path = os.path.join(config_dir, "ipc_config.json")
+        config_dir_MAC = "/tmp"
+        config_path = os.path.join(config_dir_MAC, "ipc_config.json")
 
-    os.makedirs(config_dir, exist_ok=True)  # Now we make sure the chosen dir exists
+    os.makedirs(config_dir_MAC, exist_ok=True)  # Now we make sure the chosen dir exists
     print(config_path)
     with open(config_path, "w") as f:
         json.dump({"socket_path": socket_path, "pid": pid}, f)

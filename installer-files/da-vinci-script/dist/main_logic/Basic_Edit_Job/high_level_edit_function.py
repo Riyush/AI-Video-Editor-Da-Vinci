@@ -3,7 +3,11 @@ from Basic_Edit_Job.supporting_edit_tasks.timelineState import TimelineState
 from Basic_Edit_Job.supporting_edit_tasks.adapt_timestamps_to_pacing import adapt_timestamps_to_pacing
 from Basic_Edit_Job.supporting_edit_tasks.recreate_finalized_timeline import recreate_finalized_timeline
 from Basic_Edit_Job.supporting_edit_tasks.add_magiczoom_to_timestamps import determine_magic_zoom_timestamps
-#from Basic_Edit_Job.supporting_edit_tasks.detect_silences import detect_silences_in_media
+from Basic_Edit_Job.supporting_edit_tasks.get_audio_files_in_track import get_wav_files_for_track
+from Basic_Edit_Job.supporting_edit_tasks.add_captions import add_captions
+
+import json
+import traceback
 
 def execute_basic_edit_part_1(edit_configurations, resolve):
     try:
@@ -39,7 +43,7 @@ def execute_basic_edit_part_1(edit_configurations, resolve):
 
         # send the audio file paths to the GUI since scriptenvironment doesn't
         # have access to external dependencies like ffpmeg
-        # The GUI will get .wav files and get silence timestamps and send them back to the script
+        # The GUI will create .wav files and get silence timestamps and send them back to the script
 
 
         # This completes this part of the function because now we need to asynchronously
@@ -48,6 +52,7 @@ def execute_basic_edit_part_1(edit_configurations, resolve):
         # The GUI will send a message with the silence timestamps back to the script
         # which will trigger part 2 of the editing process which is trimming the footage.
 
+        #Also, send the number of audio tracks on the current timeline,which
         #return status string, simple message, and audio_file_paths for the GUI to contine edit process
         return "success", f"Started Basic Edit, Please get .wav files and silence timestamps", original_audio_file_paths
 
@@ -71,6 +76,7 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve, 
         timelineState = TimelineState(timeline)
         
         #Based on the user's preffered pacing, cut different durations of the silences
+        # This basically informs silence removal process
 
         remove_silences = edit_configurations["silence_removal"]
         pacing = edit_configurations["pacing_choice"]
@@ -116,13 +122,81 @@ def execute_basic_edit_part_2(edit_configurations, silence_timestamps, resolve, 
         # In the future, we need a method to do a great job of deermining when to implement the zoom in
         print("START OF Zoom Cut Implementation PROCESS")
         use_zoom_cuts = edit_configurations["use_cuts_and_transitions"]
-        if use_zoom_cuts:
+        print(f"ZOOM OPTION:{use_zoom_cuts}")
+
+        if use_zoom_cuts =='true':
             determine_magic_zoom_timestamps(new_timelineState, pacing, resolve, fusion)
         print("End of Zoom Cut Implementation Process")
+
+        # Now, I need to end this function call and send a message back to the GUI to get the transcripts
+        # The GUI needs to be instructed to get transcripts
+        # Procedure for adding captions
+
+        # If we don't need to add captions, simply call part 3 without a transcripts dictionary
+        add_captions_option = edit_configurations["add_captions"]
+        print(f"CAPTIONS OPTION: {add_captions_option}")
+        if add_captions_option == "None":
+            execute_basic_edit_part_3(edit_configurations, None, resolve, fusion)
+
+        # If we need to add captions, terminate this function call and instruct the GUI to get Transcripts
+        # Then with the transcripts, enter part 3 of the edit function
+        # Return the track that needs to be transcribed as well
+        else:
+            tracks= edit_configurations["tracks_to_transcribe"]
+            # Code to handle if tracks is a serialized string or a true python list
+            if isinstance(tracks, str):
+                tracks_list = json.loads(tracks)
+            else:
+                tracks_list = tracks
+
+            track_index_to_transcribe = tracks_list[0]
+            wav_paths_in_track = get_wav_files_for_track(new_timelineState, track_index_to_transcribe)
+            
+            return "pending", "Implemented Magic Zooms, Please get Transcripts for Captions", wav_paths_in_track
 
         return "success", "Completed Basic Edit", {}
     except Exception as e:
         # This block will catch any exception and return them to the socket
         # This way, errors are caught and returned to the GUI rather than kill the 
         # GUI - script connection entirely
+        return "failure", f"An error occurred: {type(e).__name__} - {e}", {}
+
+def execute_basic_edit_part_3(edit_configurations, transciptions_dict, resolve, fusion):
+    if transciptions_dict == None:
+        #In this case, there are no captions to add 
+        # Need to have proper return statement for the socket to convey
+        return f"success", "No captions were added", {}
+
+    # At this point, we know we need to add captions for a specific track
+    try:
+        # create the necessary objects to pass to support functions
+        mediaStorage = resolve.GetMediaStorage()
+        proj_manager = resolve.GetProjectManager()
+        proj = proj_manager.GetCurrentProject()
+        mediaPool = proj.GetMediaPool()
+
+        timeline = proj.GetCurrentTimeline()
+        timelineState = TimelineState(timeline)
+
+
+        tracks= edit_configurations["tracks_to_transcribe"]
+        if isinstance(tracks, str):
+            tracks_list = json.loads(tracks)
+        else:
+            tracks_list = tracks
+        
+        track_to_transcribe = tracks_list[0]
+        print(track_to_transcribe)
+
+        #At this point, we know the user wants to add captions to the entirety of a specific track
+        add_captions(transciptions_dict, track_to_transcribe, timelineState, resolve, fusion)
+
+        return "success", "Completed Basic Edit", {}
+
+    except Exception as e:
+        # This block will catch any exception and return them to the socket
+        # This way, errors are caught and returned to the GUI rather than kill the 
+        # GUI - script connection entirely
+        #print("Error:", e)
+        #traceback.print_exc()
         return "failure", f"An error occurred: {type(e).__name__} - {e}", {}

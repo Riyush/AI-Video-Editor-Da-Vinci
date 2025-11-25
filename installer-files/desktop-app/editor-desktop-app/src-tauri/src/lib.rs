@@ -18,6 +18,7 @@ pub mod App_State {
 pub mod supporting_editing_tasks {
     pub mod create_wav_files;
     pub mod get_silence_timestamps;
+    pub mod get_audio_transcripts;
 }
 
 pub mod utils {

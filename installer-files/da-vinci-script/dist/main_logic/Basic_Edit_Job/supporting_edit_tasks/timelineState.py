@@ -15,7 +15,9 @@ class TimelineState():
         
         vid_tracks_count = timeline.GetTrackCount('video')
         aud_tracks_count = timeline.GetTrackCount('audio')
-    
+        self.vid_tracks_count = vid_tracks_count
+        self.aud_tracks_count = aud_tracks_count
+
         #store video timeline item information in a dictionary 
         video_tracks = {}
         for index in range(1, vid_tracks_count + 1):

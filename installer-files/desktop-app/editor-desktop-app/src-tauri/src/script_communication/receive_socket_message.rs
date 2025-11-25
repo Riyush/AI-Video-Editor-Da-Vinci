@@ -8,6 +8,7 @@ use tauri::{AppHandle, Emitter}; // Needed for `emit_all`
 use crate::UI_communication::event_creation_handler::send_global_message;
 use crate::supporting_editing_tasks::create_wav_files::create_wav_files_using_python;
 use crate::supporting_editing_tasks::get_silence_timestamps::get_silence_timestamps_in_python;
+use crate::supporting_editing_tasks::get_audio_transcripts::get_audio_transcripts_in_python;
 use crate::script_communication::send_socket_message::send_message_via_socket;
 use crate::utils::type_check::print_type_of;
 
@@ -87,7 +88,60 @@ pub fn socket_response_handler(response: String, app: AppHandle, stream: &mut Un
                         println!("No 'status' field found in Started_Edit_Job response.");
                     }
                 }
+                Some("Need_Transcripts") => {
+                        // ✅ Step 1: Access payload
+                    if let Some(payload) = map.get("payload") {
+                        // ✅ Step 2: Access wav_paths (nested list)
+                        if let Some(wav_paths_val) = payload.get("wav_paths") {
+                            // ✅ Step 3: Convert JSON array to Vec<String>
+                            if let Some(wav_paths_array) = wav_paths_val.as_array() {
+                                let wav_paths: Vec<String> = wav_paths_array
+                                    .iter()
+                                    .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                                    .collect();
 
+                                println!("Extracted wav_paths: {:?}", wav_paths);
+
+                                // ✅✅✅ now, we have the wav paths and we want to 
+                                // trigger a subprocess to get transcripts for that track
+                                let success_status: String = get_audio_transcripts_in_python(wav_paths, stream).unwrap();
+
+                                // Note, we save the transcripts to a txt file on the user's computer to avoid sending
+                                // lot's of text through the socket.
+                                let serialized_status:Value = serde_json::to_value(success_status).unwrap();
+                                let message_type: String = String::from("Basic-Edit-Part-3-Apply-Captions");
+
+                                send_message_via_socket(stream, message_type, serialized_status);
+                            } else {
+                                eprintln!("'wav_paths' is not an array");
+                            }
+                        } else {
+                            eprintln!("'wav_paths' not found in payload");
+                        }
+                    } else {
+                        eprintln!("'payload' not found in response");
+                    }
+                }
+                // In this case, we have received the number of audio tracks 
+                // and want to transmit that to the frontend
+                Some("Get_Number_Of_Audio_Tracks") => {
+                    if let Some(payload) = map.get("payload") {
+                        if let Some(num_audio_tracks) = payload.get("Audio_Tracks_Count") {
+                            // Convert serde_json::Value → int
+                            if let Some(num) = num_audio_tracks.as_i64() {
+                                // Get the number of audio tracks and send it back to the GUI via event
+                                let command_name: &str = "Emit_Audio_Tracks_Count";
+                                let mut parameters: HashMap<String, String> = HashMap::new();
+                                parameters.insert("Audio_Track_Count".to_string(), num.to_string());
+                                send_global_message(app, command_name, parameters);
+                            }
+                            else {
+                                eprintln!("Audio_Tracks_Count is not an integer");
+                            }
+                            
+                        }
+                    }
+                }
                 // add response handling for other values of type key
                 Some(other_type) => {
                     // Parse unexpectev values of type

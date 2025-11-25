@@ -28,18 +28,18 @@ struct Payload {
 // NOTE: This depends on an existing file created by the script in Application Support
 pub fn get_script_socket_path() -> Option<String> {
     // First, check try global Application Support
-    let mut global_config_path =
+    let mut global_config_path_MAC =
         PathBuf::from("/Library/Application Support/AI-Video-Editor/ipc_config.json");
 
-    if global_config_path.exists() {
-        return Some(global_config_path.to_string_lossy().into_owned());
+    if global_config_path_MAC.exists() {
+        return Some(global_config_path_MAC.to_string_lossy().into_owned());
     }
 
     // Then try /tmp directory
-    let mut tmp_config_path = PathBuf::from("/tmp/ipc_config.json");
+    let mut tmp_config_path_MAC = PathBuf::from("/tmp/ipc_config.json");
 
-    if tmp_config_path.exists() {
-        return Some(tmp_config_path.to_string_lossy().into_owned());
+    if tmp_config_path_MAC.exists() {
+        return Some(tmp_config_path_MAC.to_string_lossy().into_owned());
     }
 
     None

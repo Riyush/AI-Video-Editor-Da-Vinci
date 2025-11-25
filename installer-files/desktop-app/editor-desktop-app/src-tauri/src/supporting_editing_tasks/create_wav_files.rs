@@ -11,15 +11,15 @@ use crate::script_communication::send_socket_message::send_message_via_socket;
 
 pub fn create_wav_files_using_python(paths_dict: HashMap<usize, Vec<String>>, stream: &mut UnixStream) -> Result<String, Box<dyn Error>> {
     // Get path to the production python interpreter
-    let python_interpreter = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3.12");
+    let python_interpreter_MAC = String::from("/Library/Application Support/GameTime/main_logic/production_env/bin/python3.12");
     
     // Get path to create_wav_files script in production environment
-    let py_path = PathBuf::from("/Library/Application Support/GameTime/main_logic/Basic_Edit_Job/supporting_edit_tasks/convert_media_to_wav.py");
+    let py_path_MAC = PathBuf::from("/Library/Application Support/GameTime/main_logic/Basic_Edit_Job/supporting_edit_tasks/convert_media_to_wav.py");
 
-    println!("python file path: {}", py_path.display());
+    println!("python file path: {}", py_path_MAC.display());
 
-    if !py_path.exists() {
-        return Err(format!("Python script not found at: {}", py_path.display()).into());
+    if !py_path_MAC.exists() {
+        return Err(format!("Python script not found at: {}", py_path_MAC.display()).into());
     }
 
     let paths_str: &str = &serde_json::to_string(&paths_dict).unwrap();
@@ -27,8 +27,8 @@ pub fn create_wav_files_using_python(paths_dict: HashMap<usize, Vec<String>>, st
 
     // spawn a child process to execute the python function to get .wav files
     // use the python interpreter installed on the user's system.
-    let mut child = Command::new(python_interpreter)
-    .arg(&py_path)
+    let mut child = Command::new(python_interpreter_MAC)
+    .arg(&py_path_MAC)
     .stdin(Stdio::piped())
     .stdout(Stdio::piped())
     .stderr(Stdio::piped())

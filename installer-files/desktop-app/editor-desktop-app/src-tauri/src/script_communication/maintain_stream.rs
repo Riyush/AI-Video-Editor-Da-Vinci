@@ -11,6 +11,7 @@ use serde_json;
 use crate::script_communication::initial_connect::*;
 use crate::script_communication::receive_socket_message::socket_response_handler;
 use crate::script_communication::send_socket_message::send_message_via_socket;
+use crate::App_State::app_state::ThreadMessage;
 
 /*  This function takes ownership of the socket, passes it to a spawned thread
    and continuously checks for:
@@ -65,38 +66,70 @@ pub fn maintain_socket_connection(
     loop {
         // 👂 Check for messages from the main thread's event_sender (non-blocking)
         if let Ok(msg_from_frontend) = receiver.try_recv() {
+            // Extract "message_type" safely
+            let type_opt = msg_from_frontend
+                .get("message_type")
+                .and_then(|v| v.as_str());
 
-            // The user has sent an edit job via the frontend here.
-            println!("Main thread says: {:#?}", msg_from_frontend);
+            // Extract "payload" safely
+            let payload_opt = msg_from_frontend.get("payload");
 
-            // Process the message into a Hashmap<String, String> to easily pass into send_message_via_socket().
-            if let Value::Object(map) = msg_from_frontend {
-                let mut processed: HashMap<String, String> = map.into_iter().filter_map(|(key, value)| {
-
-                    let string_val = match value {
-                    Value::Bool(b) => Some(b.to_string()),              // "true"/"false"
-                    Value::String(s) => Some(s),                        // keep as-is
-                    Value::Number(n) => Some(n.to_string()),            // optional: keep numbers
-                    Value::Null => None,                                // optional: skip nulls
-                    other => Some(other.to_string()),                   // optional: stringify anything else
-                    };
-                    string_val.map(|v| (key, v))
-                }).collect();
-
-                println!("Processed config: {:?}", processed);
-                let processed_json_value = serde_json::to_value(processed).unwrap();
-                // This design is faulty because there is no value in processed that indicates
-                // the type of message being sent from the GUI frontend to this backend thread
-                // We always have type: Basic Edit Job, 
-                // we need some match statement here to determine the message type variable.
-
-                // Now we pass processed as a paramter to send_socket_message which is meant 
-                let message_type = String::from("Basic-Edit-Job");
-                send_message_via_socket(&mut stream, message_type, processed_json_value);
-                
-            } else {
-                    eprintln!("Expected a JSON object");
+            match(type_opt){
+                // ----------------------------
+                // ✅ Variant 1: Simple messages - used to get number of audio tracks in timeline
+                // ----------------------------
+                Some("Get_Number_Of_Audio_Tracks") => {
+                println!("Get_Number_Of_Audio_Tracks");
+                        // Example of handling a simple string command
+                        send_message_via_socket(
+                            &mut stream,
+                            "Get_Number_Of_Audio_Tracks".into(),
+                            serde_json::json!({})
+                        );
+                    
                 }
+
+                // ----------------------------
+                // ✅ Variant 2: Request messages - used for actual edits
+                // ----------------------------
+                Some("Basic-Edit-Job") => {
+                    // The user has sent an edit job via the frontend here.
+                    println!("{:#?}", type_opt);
+                
+                    // Process the message into a Hashmap<String, String> to easily pass into send_message_via_socket().
+                    if let Some(payload) = payload_opt {
+                        if let Value::Object(map) = payload {
+                        let mut processed: HashMap<String, String> = map.into_iter().filter_map(|(key, value)| {
+
+                            let string_val = match value {
+                            Value::Bool(b) => Some(b.to_string()),              // "true"/"false"
+                            Value::String(s) => Some(s.to_string()),                        // keep as-is
+                            Value::Number(n) => Some(n.to_string()),            // optional: keep numbers
+                            Value::Null => None,                                // optional: skip nulls
+                            other => Some(other.to_string()),                   // optional: stringify anything else
+                            };
+                            string_val.map(|v| (key.clone(), v))
+                            }).collect();
+
+                            println!("Processed config: {:?}", processed);
+                            let processed_json_value = serde_json::to_value(processed).unwrap();
+                            // Each ThreadMessage is standardized to have a message_type and a payload
+                            // This design allows me process different message_types accordingly
+                            // So far we process Basic-Edit-Job and Get_Number_Of_Audio_Tracks
+                            // as unique messages from the GUI Frontend Via commands
+
+                            // Now we pass processed as a paramter to send_socket_message which is meant 
+                            let message_type = String::from("Basic-Edit-Job");
+                            send_message_via_socket(&mut stream, message_type, processed_json_value);
+                            
+                    }}
+            }
+            
+            _ =>{
+                println!("Unrecognized Message");
+            }
+
+            }
         }
 
         // 👂 Check for messages from the script (non-blocking read for now)
